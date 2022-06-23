@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
-        //se non lo seleziona
+        //se non lo seleziona nulla e clicca "Carica"
         else{
             Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show();
         }
