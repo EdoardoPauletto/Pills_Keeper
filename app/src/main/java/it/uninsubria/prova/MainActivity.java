@@ -34,7 +34,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
-
+    
     private static final int PICK_IMAGE_REQUEST = 1;
 
     private Button mButtonChooseImage;
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mImageView;
     private ProgressBar mProgressBar;
 
-    private Uri mImageUri;
+    private Uri mImageUri; //tipo url ma per i file
 
     //UPLOAD
     private StorageReference mStorageRef;
@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mButtonChooseImage = findViewById(R.id.pulsanteScegli);
+        mButtonChooseImage = findViewById(R.id.pulsanteScegli); //gli assegno il reale elemento
         mButtonUpload = findViewById(R.id.pulsanteCarica);
         mTextViewShowUplaods = findViewById(R.id.testoMostraCarica);
         mEditTextFileName = findViewById(R.id.testoModificabile);
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar = findViewById(R.id.progressBar);
 
         //UPLOAD
-        //con la string "uploads" andremo i nquella cartella senò andiamo al top node
+        //con la string "uploads" andremo in quella cartella senò andiamo al top node
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
@@ -129,8 +129,7 @@ public class MainActivity extends AppCompatActivity {
     private void uploadFile(){
         //controllo che effettivamente abbia selezionato un'immagine
         if(mImageUri != null){ //mStorageRef punta lla cartella di upload
-            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis()
-            + "." + getFileExtension(mImageUri)); //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
+            StorageReference fileReference = mStorageRef.child(System.currentTimeMillis() + "." + getFileExtension(mImageUri)); //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
 
             fileReference.putFile(mImageUri)//upload del file , continua sotto
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             //azioni quando upload avviene
-                            //quando avviene resetto la progressbar faccio delay di 5 sec
+                            //quando avviene resetto la progressbar faccio delay di 5 sec PERCHè???????????????????????????????????????????????????????????
                             Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
                                 @Override

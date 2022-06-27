@@ -1,6 +1,19 @@
+package it.uninsubria.prova
+
+import android.net.Uri
+
+data class Upload(var name:String, val mImageUrl:String) {
+
+    init {
+        if (name.trim() == "") {
+            name = "No Name"
+        }
+    }
+}
+/*
 package it.uninsubria.prova;
 
-import android.net.Uri;
+        import android.net.Uri;
 
 public class Upload {
     private String mName;
@@ -36,4 +49,4 @@ public class Upload {
     public void setmImageUrl(String mImageUrl) {
         mImageUrl = mImageUrl;
     }
-}
+}*/
