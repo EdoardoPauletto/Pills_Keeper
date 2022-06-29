@@ -6,10 +6,7 @@ import android.widget.Adapter
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 
 class ListActivity : AppCompatActivity() {
     //val data: MutableList<Upload> = ArrayList()
@@ -25,7 +22,16 @@ class ListActivity : AppCompatActivity() {
         //listView.adapter = adapter
         tv = findViewById<TextView>(R.id.textView)
 
-        FirebaseDatabase.getInstance().getReference().addChildEventListener(getItemsEventListener())
+
+        FirebaseDatabase.getInstance().reference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                tv.text = snapshot.value.toString()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
 
     }
     private fun getItemsEventListener(): ChildEventListener{
@@ -34,7 +40,7 @@ class ListActivity : AppCompatActivity() {
                 //val elemento = snapshot.getValue(Upload::class.java)
                 //data.add(elemento!!)
                 //adapter.notifyDataSetChanged()
-                tv.text = snapshot.getValue(String::class.java)
+                //tv.text = snapshot.getValue(String::class.java)
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {

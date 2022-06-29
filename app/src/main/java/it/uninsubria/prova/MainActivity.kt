@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { taskSnapshot ->
 
                     //azioni quando upload avviene
-                    //quando avviene resetto la progressbar faccio delay di 5 sec PERCHè???????????????????????????????????????????????????????????
+                    //quando avviene resetto la progressbar faccio delay di 5 millisec
                     val handler = Handler()
                     handler.postDelayed({ mProgressBar!!.progress = 0 }, 500)
                     Toast.makeText(this@MainActivity, "Upload riuscito", Toast.LENGTH_LONG).show()
