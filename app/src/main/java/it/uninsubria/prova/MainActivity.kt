@@ -1,3 +1,140 @@
+package it.uninsubria.prova
+
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.database.DatabaseReference
+import android.os.Bundle
+import it.uninsubria.prova.R
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.database.FirebaseDatabase
+import android.content.Intent
+import it.uninsubria.prova.MainActivity
+import android.app.Activity
+import com.squareup.picasso.Picasso
+import android.content.ContentResolver
+import android.net.Uri
+import android.os.Handler
+import android.view.View
+import android.webkit.MimeTypeMap
+import android.widget.*
+import com.google.android.gms.tasks.OnSuccessListener
+import it.uninsubria.prova.Upload
+import com.google.android.gms.tasks.OnFailureListener
+
+class MainActivity : AppCompatActivity() {
+    private val PICK_IMAGE_REQUEST: Int = 1
+
+    private lateinit var mButtonChooseImage: Button
+    private lateinit var mButtonUpload: Button
+    private lateinit var mTextViewShowUplaods: TextView
+    private lateinit var mEditTextFileName: EditText
+    private lateinit var mImageView: ImageView
+    private lateinit var mProgressBar: ProgressBar
+
+    private lateinit var mImageUri: Uri //tipo url ma per i file
+
+    //UPLOAD
+    private lateinit var mStorageRef: StorageReference
+    private lateinit var mDatabaseRef: DatabaseReference
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        mButtonChooseImage = findViewById(R.id.pulsanteScegli) //gli assegno il reale elemento
+        mButtonUpload = findViewById(R.id.pulsanteCarica)
+        mTextViewShowUplaods = findViewById(R.id.testoMostraCarica)
+        mEditTextFileName = findViewById(R.id.testoModificabile)
+        mImageView = findViewById(R.id.immagine)
+        mProgressBar = findViewById(R.id.progressBar)
+
+        //UPLOAD
+        //con la string "uploads" andremo in quella cartella senò andiamo al top node
+        mStorageRef = FirebaseStorage.getInstance().reference
+        mDatabaseRef = FirebaseDatabase.getInstance().reference
+
+        mButtonChooseImage.setOnClickListener(View.OnClickListener { openFileChooser() }) //creare metodo
+        mButtonUpload.setOnClickListener(View.OnClickListener { uploadFile() })
+        mTextViewShowUplaods.setOnClickListener(View.OnClickListener {
+            val intent = Intent(this@MainActivity, ListActivity::class.java)
+            startActivity(intent)
+        })
+    }
+
+    private fun openFileChooser() {
+        val intent = Intent()
+        //vede solo immagini
+        intent.type = "image/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+        //dopo creo onActivityResult che verrà chiamato quando prendo il file ^
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        //requestcode == richiesta che vogliamo che faccia
+        //resultcode == RESULT_OK se prende l'immagine va alla next line
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.data != null) {
+            //se l'utente sceglie un' immagine controlla che non sia nulla
+            //return del uri dell'immagine scelta
+            mImageUri = data.data!! //contiene l'uri (forziamo non null)
+            Picasso.with(this).load(mImageUri).into(mImageView)
+            //mImageView.setImageURI(mImageUri);
+        }
+    }
+
+    //UPLOAD ritorna il tipo di file
+    private fun getFileExtension(uri: Uri): String? {
+        val cR = contentResolver
+        val mime = MimeTypeMap.getSingleton()
+        return mime.getExtensionFromMimeType(cR.getType(uri))
+    }
+
+    //UPLOAD
+    private fun uploadFile() {
+        //controllo che effettivamente abbia selezionato un'immagine
+        if (mImageUri != null) { //mStorageRef punta lla cartella di upload
+            val fileReference = mStorageRef!!.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri!!)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
+            //il nome è formato da tempo in ms ed estensione per evitare omonimi
+
+            fileReference.putFile(mImageUri!!) //upload del file , continua sotto
+                .addOnSuccessListener { taskSnapshot ->
+
+                    //azioni quando upload avviene
+                    //quando avviene resetto la progressbar faccio delay di 5 sec PERCHè???????????????????????????????????????????????????????????
+                    val handler = Handler()
+                    handler.postDelayed({ mProgressBar!!.progress = 0 }, 500)
+                    Toast.makeText(this@MainActivity, "Upload riuscito", Toast.LENGTH_LONG).show()
+                    //upload class
+                    //creo costruttore e prendo l'edit text perchè è dove andra il nome del file
+                    val upload = Upload(mEditTextFileName!!.text.toString().trim { it <= ' ' },
+                        taskSnapshot.uploadSessionUri.toString())
+                    //per avere anche i meta data (URL,name)
+                    //crea nuova entrata nel db con unico id
+                    val uploadId = mDatabaseRef!!.push().key
+                    //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
+                    mDatabaseRef!!.child(uploadId!!).setValue(upload)
+
+                } //non finisce, c'è il punto
+                .addOnFailureListener { e -> //azioni quando upload non avviene
+                    //no solo this perchè siamo in una classe interna
+                    Toast.makeText(this@MainActivity, e.message, Toast.LENGTH_SHORT).show()
+                } //non finisce, c'è il punto
+                .addOnProgressListener { tasksnapshot -> //azioni quando upload sta avvenendo
+                    //voglio aggiornare la progress bar con la percentuale corrente
+                    //estrarre il progresso da tasksnapshot
+                    val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount
+                    //aggiorno la progress bar
+                    mProgressBar!!.progress = progress.toInt()
+                }
+        } else {
+            Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+/*
 package it.uninsubria.prova;
 
 import androidx.annotation.NonNull;
@@ -34,7 +171,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity {
-    
+
     private static final int PICK_IMAGE_REQUEST = 1;
 
     private Button mButtonChooseImage;
@@ -85,7 +222,8 @@ public class MainActivity extends AppCompatActivity {
         mTextViewShowUplaods.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -107,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         //requestcode == richiesta che vogliamo che faccia
         //resultcode == RESULT_OK se prende l'immagine va alla next line
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null){
+            && data != null && data.getData() != null){
             //se l'utente sceglie un' immagine controlla che non sia nulla
             //return del uri dell'immagine scelta
             mImageUri = data.getData(); //contiene l'uri
@@ -133,56 +271,56 @@ public class MainActivity extends AppCompatActivity {
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
 
             fileReference.putFile(mImageUri)//upload del file , continua sotto
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            //azioni quando upload avviene
-                            //quando avviene resetto la progressbar faccio delay di 5 sec PERCHè???????????????????????????????????????????????????????????
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mProgressBar.setProgress(0);
-                                }
-                            }, 500);
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        //azioni quando upload avviene
+                        //quando avviene resetto la progressbar faccio delay di 5 sec PERCHè???????????????????????????????????????????????????????????
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mProgressBar.setProgress(0);
+                            }
+                        }, 500);
 
-                            Toast.makeText(MainActivity.this, "Upload riuscito", Toast.LENGTH_LONG).show();
-                            //upload class
-                            //creo costruttore e prendo l'edit text perchè è dove andra il nome del file
-                            Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),
-                                    taskSnapshot.getUploadSessionUri().toString());
-                            //per avere anche i meta data (URL,name)
-                            //crea nuova entrata nel db con unico id
-                            String uploadId = mDatabaseRef.push().getKey();
-                            //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
-                            mDatabaseRef.child(uploadId).setValue(upload);
+                        Toast.makeText(MainActivity.this, "Upload riuscito", Toast.LENGTH_LONG).show();
+                        //upload class
+                        //creo costruttore e prendo l'edit text perchè è dove andra il nome del file
+                        Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),
+                            taskSnapshot.getUploadSessionUri().toString());
+                        //per avere anche i meta data (URL,name)
+                        //crea nuova entrata nel db con unico id
+                        String uploadId = mDatabaseRef.push().getKey();
+                        //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
+                        mDatabaseRef.child(uploadId).setValue(upload);
 
-                        }
-                    })//non finisce, c'è il punto
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e){
-                            //azioni quando upload non avviene
-                            //no solo this perchè siamo in una classe interna
-                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    })//non finisce, c'è il punto
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(@NonNull UploadTask.TaskSnapshot tasksnapshot) {
-                            //azioni quando upload sta avvenendo
-                            //voglio aggiornare la progress bar con la percentuale corrente
-                            //estrarre il progresso da tasksnapshot
-                            double progress = (100.0 * tasksnapshot.getBytesTransferred() / tasksnapshot.getTotalByteCount());
-                            //aggiorno la progress bar
-                            mProgressBar.setProgress((int)progress);
-                        }
-                    });
+                    }
+                })//non finisce, c'è il punto
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e){
+                        //azioni quando upload non avviene
+                        //no solo this perchè siamo in una classe interna
+                        Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })//non finisce, c'è il punto
+                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(@NonNull UploadTask.TaskSnapshot tasksnapshot) {
+                        //azioni quando upload sta avvenendo
+                        //voglio aggiornare la progress bar con la percentuale corrente
+                        //estrarre il progresso da tasksnapshot
+                        double progress = (100.0 * tasksnapshot.getBytesTransferred() / tasksnapshot.getTotalByteCount());
+                        //aggiorno la progress bar
+                        mProgressBar.setProgress((int)progress);
+                    }
+                });
         }
         //se non lo seleziona nulla e clicca "Carica"
         else{
             Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show();
         }
     }
-
 }
+ */
