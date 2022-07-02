@@ -102,7 +102,7 @@ class ListActivity : AppCompatActivity() {
         }
         return childEventListener
     }
-
+//non serve più
     private fun getItemsEventListener(): ChildEventListener {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
