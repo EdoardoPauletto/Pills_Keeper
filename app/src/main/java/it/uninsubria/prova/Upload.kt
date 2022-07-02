@@ -2,18 +2,25 @@ package it.uninsubria.prova
 
 import android.net.Uri
 
-data class Upload(var name:String, val mImageUrl:String) {
+data class Upload(var name:String?, var mImageUrl:String?) {
+    //prova .set
+    constructor() : this("","")
+    fun set(utente: Upload?) {
+        name = utente?.name
+        mImageUrl = utente?.mImageUrl
+    }
+    //prova
 
-    init {
+    //originale per togleire spazi vuoti
+    /*init {
         if (name.trim() == "") {
             name = "No Name"
         }
-    }
+    }*/
 }
-/*
-package it.uninsubria.prova;
+/*package it.uninsubria.prova;
 
-        import android.net.Uri;
+import android.net.Uri;
 
 public class Upload {
     private String mName;
