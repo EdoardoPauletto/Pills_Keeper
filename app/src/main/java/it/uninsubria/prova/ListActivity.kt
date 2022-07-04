@@ -23,41 +23,26 @@ class ListActivity : AppCompatActivity() {
     private lateinit var adattatore: ArrayAdapter<Upload>
     //oggetti lista
     private lateinit var oggettiLista: ListView
-    //
+    //PROVA
+    lateinit var mToolbar: androidx.appcompat.widget.Toolbar
+    lateinit var mListView: ListView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-        //tv = findViewById<TextView>(R.id.testoPercorso)
 
-        //OIRIGNALE
-        /* FirebaseDatabase.getInstance().reference.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                tv.text = snapshot.value.toString()
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
-            }
-        })*/
-
-        //PROVA
         //mostro all'adapter lo stile da seguire "simple_list_item" e i dati da inserire "dataUtente"
-        adattatore = ArrayAdapter(this, android.R.layout.simple_list_item_1, dataUtente)
-        oggettiLista = findViewById<ListView>(R.id.lista)
+
+       adattatore = ArrayAdapter(this, android.R.layout.simple_list_item_1, dataUtente)
+        oggettiLista = findViewById<ListView>(R.id.lista) //contiene oggetto della lista
         //Assegno alla listview l'adapter "adattore"
         oggettiLista.adapter = adattatore
 
         FirebaseHelper.readUtentiOggetti(getUserInput())
 
 
-        //prova ListView
-        //arraylist inizializzata prima
-        /*val data = arrayListOf<String>()
-        for (i in 1..100) {
-            data.add("Item $i")
-        }
-        val adattore = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data)
-        lista.adapter = adattore*/
+
 
     }
 
@@ -67,10 +52,12 @@ class ListActivity : AppCompatActivity() {
         //location di un database dato
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                //snapshot di un nuovo figlio aggiunto
                 val utente = snapshot.getValue(Upload::class.java)
+                //indice nell'array
+                val utenteIndex = dataUtente.indexOf(utente)
                 //add nuovo Upload item
                 dataUtente.add(utente!!)
-                val utenteIndex = dataUtente.indexOf(utente)
                 //oggettiLista.setItemChecked(utenteIndex) spunta
                 adattatore.notifyDataSetChanged()
             }
