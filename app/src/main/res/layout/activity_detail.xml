@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailActivity"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/cover"
+        android:layout_marginTop="10dp"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/italy"
+        android:adjustViewBounds="true"
+        android:contentDescription="cover"
+        />
+    <TextView
+        android:id="@+id/title"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="title_place_holder"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:lines="2"
+        android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/author"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="author_place_holder"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:lines="1"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="author_place_holder"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        />
+
+</LinearLayout>
