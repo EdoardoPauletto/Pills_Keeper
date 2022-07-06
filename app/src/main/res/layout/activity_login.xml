@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
         android:gravity="center"
-        android:text="Welcome To"
+        android:text="Benvenuto su"
         android:textColor="#FFFFFF"
         android:textSize="36sp" />
 
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
         android:gravity="center"
-        android:text="ToDo App"
+        android:text="Pills Keeper"
         android:textColor="#FFFFFF"
         android:textSize="44sp"
         android:textStyle="bold" />
