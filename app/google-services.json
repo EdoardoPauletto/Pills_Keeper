@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "872710652339",
+    "firebase_url": "https://prove-b822e-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "prove-b822e",
+    "storage_bucket": "prove-b822e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872710652339:android:513dcb4c10802fb0408bc6",
+        "android_client_info": {
+          "package_name": "com.main.prova"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBefglHnXoEldlj_nDDBoO3CeykekgY_Es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872710652339:android:da96eef9bb27a1c8408bc6",
+        "android_client_info": {
+          "package_name": "it.uninsubria.pillskeeper"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBefglHnXoEldlj_nDDBoO3CeykekgY_Es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872710652339:android:865606fa92f7545d408bc6",
+        "android_client_info": {
+          "package_name": "it.uninsubria.prova"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBefglHnXoEldlj_nDDBoO3CeykekgY_Es"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872710652339-v0mt24mmlflm869hh6bld1acdm1ell1t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
