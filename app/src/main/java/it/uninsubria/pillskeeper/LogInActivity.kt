@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -16,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 class LogInActivity: AppCompatActivity() {
+
     private lateinit var auth: FirebaseAuth
     private var TAG = "LoginActivity"
     lateinit var loginButton: Button
@@ -25,6 +27,7 @@ class LogInActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_login)
 
         auth = Firebase.auth
@@ -56,7 +59,6 @@ class LogInActivity: AppCompatActivity() {
         if(username.text.toString().isEmpty()){
             return
         }
-
         if(!Patterns.EMAIL_ADDRESS.matcher(username.text.toString()).matches()){
             return
         }
@@ -66,7 +68,6 @@ class LogInActivity: AppCompatActivity() {
                 if (task.isSuccessful){
                     Toast.makeText(this, "ti abbiamo inviato l'email",Toast.LENGTH_SHORT).show()
                 }
-
             }
     }
 
@@ -96,7 +97,7 @@ class LogInActivity: AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail:success")
-                    val intent = Intent(this, LogInActivity::class.java)
+                    val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else { // If sign in fails, display a message to the user.
