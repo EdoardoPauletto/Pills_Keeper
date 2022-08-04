@@ -1,12 +1,15 @@
 package it.uninsubria.pillskeeper
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -18,7 +21,7 @@ class LogInActivity: AppCompatActivity() {
     lateinit var loginButton: Button
     lateinit var signUpTextView: TextView
     lateinit var emailEditText: EditText
-    lateinit var passwordEditText: EditText
+    lateinit var forgottenPasswordTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,38 @@ class LogInActivity: AppCompatActivity() {
         signUpTextView.setOnClickListener {
             onSignUpClick()
         }
+
+        forgottenPasswordTextView = findViewById<TextView>(R.id.forgottenPasswordTextView);
+        forgottenPasswordTextView.setOnClickListener {
+            onSignUpClick()
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Forgot Password")
+            val view = layoutInflater.inflate(R.layout.activity_forgotten_password, null)
+            val username = view.findViewById<EditText>(R.id.User)
+            builder.setView(view)
+            builder.setPositiveButton("Reset", DialogInterface.OnClickListener{_, _ ->
+                forgottenPassword(username)
+            })
+            builder.setNegativeButton("close", DialogInterface.OnClickListener{_, _->})
+            builder.show()
+        }
+    }
+   private fun forgottenPassword(username : EditText){
+        if(username.text.toString().isEmpty()){
+            return
+        }
+
+        if(!Patterns.EMAIL_ADDRESS.matcher(username.text.toString()).matches()){
+            return
+        }
+
+        auth.sendPasswordResetEmail(username.text.toString())
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    Toast.makeText(this, "ti abbiamo inviato l'email",Toast.LENGTH_SHORT).show()
+                }
+
+            }
     }
 
     private fun onSignUpClick() {
@@ -44,13 +79,13 @@ class LogInActivity: AppCompatActivity() {
     private fun onLoginClick() {
         emailEditText = findViewById<EditText>(R.id.emailEditText)
         val email = emailEditText.text.toString().trim()
-        passwordEditText = findViewById<EditText>(R.id.passwordEditText)
-        val password = passwordEditText.text.toString().trim()
+        forgottenPasswordTextView = findViewById<EditText>(R.id.passwordEditText)
+        val password = forgottenPasswordTextView.text.toString().trim()
         if (email.isEmpty()) {
             emailEditText.error = "Enter email"
             return
         }else if (password.isEmpty()) {
-            passwordEditText.error = "Enter password"
+            forgottenPasswordTextView.error = "Enter password"
             return
         }
         loginUser(email, password)
