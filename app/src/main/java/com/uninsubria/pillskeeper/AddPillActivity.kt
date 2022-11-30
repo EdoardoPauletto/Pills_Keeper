@@ -51,6 +51,7 @@ class AddPillActivity : AppCompatActivity() {
         /*mTextViewShowUplaods.setOnClickListener(View.OnClickListener {
             val intent = Intent(this@MainActivity, ListActivity::class.java)
             startActivity(intent)
+            finish()
         })*/
     }
     private fun openFileChooser() {
@@ -100,6 +101,10 @@ class AddPillActivity : AppCompatActivity() {
                     //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
                     mDatabaseRef!!.child("farmaci/" + uploadId!!).setValue(upload)
 
+                    //Torno nel main
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } //non finisce, c'è il punto
                 .addOnFailureListener { e -> //azioni quando upload non avviene
                     //NON solo this perchè siamo in una classe interna

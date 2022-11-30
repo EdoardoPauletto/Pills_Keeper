@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onAddClick() {
+    private fun onAddClick() { //quando pulsante cliccato
         val intent = Intent(this, AddPillActivity::class.java)
         startActivity(intent)
         finish()
@@ -30,9 +30,9 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() { //quando l'app si avvia
         super.onStart()
         if(auth.currentUser == null) { // Se l'utente non già loggato (non-null)
-        val intent = Intent(this, LogInActivity::class.java) //vado al login
-        startActivity(intent)
-        finish()
+            val intent = Intent(this, LogInActivity::class.java) //vado al login
+            startActivity(intent)
+            finish()
         }
     }
     /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
