@@ -2,12 +2,12 @@ package com.uninsubria.pillskeeper
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.view.View
+import android.provider.AlarmClock
 import android.webkit.MimeTypeMap
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
@@ -16,6 +16,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
+
 
 class AddPillActivity : AppCompatActivity() {
     private val PICK_IMAGE_REQUEST: Int = 1
@@ -48,13 +49,13 @@ class AddPillActivity : AppCompatActivity() {
         mStorageRef = FirebaseStorage.getInstance().reference
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
 
-        mButtonChooseImage.setOnClickListener(View.OnClickListener { openFileChooser() }) //creare metodo
+        mButtonChooseImage.setOnClickListener { openFileChooser() } //creare metodo
         mButtonUpload.setOnClickListener { uploadFile() } //semplificato
-        /*mTextViewShowUplaods.setOnClickListener(View.OnClickListener {
-            val intent = Intent(this@MainActivity, ListActivity::class.java)
-            startActivity(intent)
-            finish()
-        })*/
+        mTextViewShowUplaods.setOnClickListener{
+            val openClockIntent = Intent(AlarmClock.ACTION_SET_ALARM) //apre direttamente l'orologio, funziona
+            openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(openClockIntent)
+        }
     }
     private fun openFileChooser() {
         val intent = Intent()
@@ -83,7 +84,7 @@ class AddPillActivity : AppCompatActivity() {
 
     //UPLOAD
     private fun uploadFile() {
-        if (!mImageUri.path.isNullOrEmpty()) { //controllo che effettivamente abbia selezionato un'immagine
+        if (!mImageUri.path.isNullOrBlank()) { //controllo che effettivamente abbia selezionato un'immagine (DA TESTARE)
             //mStorageRef punta alla cartella Storage
             val fileReference = mStorageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
