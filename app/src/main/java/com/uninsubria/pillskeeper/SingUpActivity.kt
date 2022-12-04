@@ -1,5 +1,6 @@
 package com.uninsubria.pillskeeper
 
+import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -29,13 +30,9 @@ class SingUpActivity : AppCompatActivity() {
 
         auth = Firebase.auth //inizializza utente col db
         registerButton = findViewById<Button>(R.id.registerButton)
-        registerButton.setOnClickListener {
-            onSignUpClick()
-        }
+        registerButton.setOnClickListener { onSignUpClick() }
         loginTextView = findViewById<TextView>(R.id.loginTextView)
-        loginTextView.setOnClickListener {
-            onLoginClick()
-        }
+        loginTextView.setOnClickListener { onLoginClick() }
     }
 
     private fun onLoginClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
@@ -87,8 +84,14 @@ class SingUpActivity : AppCompatActivity() {
                     }
                 } else { // Se registrazione fallisce, mostro un toast !!! mentre nel login mostravo un Alert
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Autenticazione fallita",
-                        Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(baseContext, "Autenticazione fallita", Toast.LENGTH_SHORT).show()
+                    val builder = AlertDialog.Builder(this)
+                    with(builder) {
+                        setTitle("Creazione di un nuovo utente fallita fallita")
+                        setMessage(task.exception?.message) //tradurre ogni possibile eccezione
+                        setPositiveButton("OK", null)
+                        show()
+                    }
                 }
             }
     }

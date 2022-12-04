@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private fun onAddClick() { //quando pulsante cliccato
         val intent = Intent(this, AddPillActivity::class.java)
         startActivity(intent)
-        finish()
+        //finish() non va terminata
     }
 
     override fun onStart() { //quando l'app si avvia

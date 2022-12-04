@@ -18,6 +18,7 @@ class LogInActivity : AppCompatActivity() {
     private var TAG = "LoginActivity" //inutile, serve solo per i LOG
     lateinit var loginButton: Button
     lateinit var signUpTextView: TextView
+    lateinit var forgotPWDTextView: TextView
     lateinit var emailEditText: EditText
     lateinit var passwordEditText: EditText
 
@@ -27,13 +28,11 @@ class LogInActivity : AppCompatActivity() {
 
         auth = Firebase.auth //inizializza utente col db
         loginButton = findViewById<Button>(R.id.loginButton)
-        loginButton.setOnClickListener {
-            onLoginClick()
-        }
-        signUpTextView = findViewById<TextView>(R.id.signUpTextView);
-        signUpTextView.setOnClickListener {
-            onSignUpClick()
-        }
+        loginButton.setOnClickListener { onLoginClick() }
+        signUpTextView = findViewById<TextView>(R.id.signUpTextView)
+        signUpTextView.setOnClickListener { onSignUpClick() }
+        forgotPWDTextView = findViewById<TextView>(R.id.forgottenPasswordTextView)
+        forgotPWDTextView.setOnClickListener { onForgotClick() }
     }
 
     private fun onSignUpClick() { //per registrarsi deve andare nell'apposita Activity
@@ -76,5 +75,16 @@ class LogInActivity : AppCompatActivity() {
                     }
                 }
             }
+    }
+
+    private fun onForgotClick() { //da fare seriamente
+        val builder = AlertDialog.Builder(this)
+        with(builder) {
+            setTitle("Opzione non valida")
+            setMessage("Opzione in sviluppo, sarà posssibile in futuro")
+            setPositiveButton("OK", null)
+            show()
+        }
+        TODO("Not yet implemented")
     }
 }

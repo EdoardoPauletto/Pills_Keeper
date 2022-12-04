@@ -35,6 +35,8 @@ class AddPillActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_pill)
 
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) //mostra il back in alto
+
         auth = Firebase.auth
         mButtonChooseImage = findViewById(R.id.selectFileButton) //gli assegno il reale elemento
         mButtonUpload = findViewById(R.id.caricaButton)
@@ -81,25 +83,25 @@ class AddPillActivity : AppCompatActivity() {
 
     //UPLOAD
     private fun uploadFile() {
-        if (mImageUri != null) { //controllo che effettivamente abbia selezionato un'immagine
+        if (!mImageUri.path.isNullOrEmpty()) { //controllo che effettivamente abbia selezionato un'immagine
             //mStorageRef punta alla cartella Storage
-            val fileReference = mStorageRef!!.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri!!)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
+            val fileReference = mStorageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
 
-            fileReference.putFile(mImageUri!!) //upload del file , continua sotto
+            fileReference.putFile(mImageUri) //upload del file , continua sotto
                 .addOnSuccessListener { taskSnapshot ->
                     //quando upload finisce, resetto la progressbar faccio delay di 5 millisec
                     val handler = Handler()
-                    handler.postDelayed({ mProgressBar!!.progress = 0 }, 500)
+                    handler.postDelayed({ mProgressBar.progress = 0 }, 500)
                     Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
 
                     //chiamo costruttore e prendo l'edit text col nome del farmaco e IL NOME DELL'IMMAGINE ??? percorso diverso per ogni utente?
-                    val upload = Upload(mEditTextFileName!!.text.toString().trim { it <= ' ' }, taskSnapshot.storage.path)
+                    val upload = Upload(mEditTextFileName.text.toString().trim { it <= ' ' }, taskSnapshot.storage.path)
                     //per avere anche i meta data (URL,name)
                     //crea nuova entrata nel db con unico id
-                    val uploadId = mDatabaseRef!!.push().key
+                    val uploadId = mDatabaseRef.push().key
                     //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
-                    mDatabaseRef!!.child("farmaci/" + uploadId!!).setValue(upload)
+                    mDatabaseRef.child("farmaci/" + uploadId!!).setValue(upload)
 
                 } //non finisce, c'è il punto
                 .addOnFailureListener { e -> //azioni quando upload non avviene
@@ -108,13 +110,11 @@ class AddPillActivity : AppCompatActivity() {
                 } //non finisce, c'è il punto
                 .addOnProgressListener { tasksnapshot -> //quando upload sta avvenendo, voglio aggiornare la progress bar con la percentuale corrente
                     val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount //estrarre il progresso da tasksnapshot
-                    mProgressBar!!.progress = progress.toInt() //aggiorno la progress bar
+                    mProgressBar.progress = progress.toInt() //aggiorno la progress bar
                 }
-                .addOnCompleteListener{ e -> //quando finisce, aspetto un attimo e poi torno al main
+                .addOnCompleteListener{ //quando finisce, aspetto un attimo e poi torno al main
                     Thread.sleep(2000)
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                    finish() //chiude questa e torna a quella prima
                 }
         } else {
             Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()

@@ -15,7 +15,12 @@
         tools:targetApi="31">
         <activity
             android:name=".AddPillActivity"
-            android:exported="false" />
+            android:exported="false">
+            <!-- aggiunte per il tasto indietro -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.uninsubria.pillskeeper.MainActivity"/>
+        </activity>
         <activity
             android:name=".SingUpActivity"
             android:exported="false" />
