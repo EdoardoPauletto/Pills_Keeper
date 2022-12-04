@@ -23,6 +23,9 @@ class SingUpActivity : AppCompatActivity() {
     lateinit var emailEditText: EditText
     lateinit var passwordEditText: EditText
     lateinit var loginTextView: TextView
+    //persone fidate (da 1 a n) nome, cognome, ruolo(figlio,ecc)
+    //numero di cell di queste persone
+    //mail medico curante
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
