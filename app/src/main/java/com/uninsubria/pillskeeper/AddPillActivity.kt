@@ -47,7 +47,7 @@ class AddPillActivity : AppCompatActivity() {
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
 
         mButtonChooseImage.setOnClickListener(View.OnClickListener { openFileChooser() }) //creare metodo
-        mButtonUpload.setOnClickListener(View.OnClickListener { uploadFile() })
+        mButtonUpload.setOnClickListener { uploadFile() } //semplificato
         /*mTextViewShowUplaods.setOnClickListener(View.OnClickListener {
             val intent = Intent(this@MainActivity, ListActivity::class.java)
             startActivity(intent)
@@ -101,10 +101,6 @@ class AddPillActivity : AppCompatActivity() {
                     //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
                     mDatabaseRef!!.child("farmaci/" + uploadId!!).setValue(upload)
 
-                    //Torno nel main
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
                 } //non finisce, c'è il punto
                 .addOnFailureListener { e -> //azioni quando upload non avviene
                     //NON solo this perchè siamo in una classe interna
@@ -113,6 +109,12 @@ class AddPillActivity : AppCompatActivity() {
                 .addOnProgressListener { tasksnapshot -> //quando upload sta avvenendo, voglio aggiornare la progress bar con la percentuale corrente
                     val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount //estrarre il progresso da tasksnapshot
                     mProgressBar!!.progress = progress.toInt() //aggiorno la progress bar
+                }
+                .addOnCompleteListener{ e -> //quando finisce, aspetto un attimo e poi torno al main
+                    Thread.sleep(2000)
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 }
         } else {
             Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
