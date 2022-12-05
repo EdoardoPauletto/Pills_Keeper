@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
         //finish() non va terminata
         //SMS
-        val smsManager: SmsManager = SmsManager.getDefault()
+       /* val smsManager: SmsManager = SmsManager.getDefault()
         smsManager.sendTextMessage("+39 " + myNumber, null, myMsg, null, null)
         Toast.makeText(this, "Message Sent", Toast.LENGTH_SHORT).show()
         //oppure
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra(Intent.EXTRA_SUBJECT, "");
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
-        }
+        }*/
         //recycleView https://www.geeksforgeeks.org/android-recyclerview-in-kotlin/ (foto, nome, quantità da assumere, quantità confezione)
     }
 

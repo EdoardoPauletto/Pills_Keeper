@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="Benvenuto su"
         android:textColor="#FFFFFF"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="Pills Keeper"
         android:textColor="#FFFFFF"
@@ -50,17 +50,65 @@
         android:hint="password"
         android:inputType="textPassword"
         android:textColorHint="@color/white"/>
+    <EditText
+        android:id="@+id/emailMedico"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:hint="Indirizzo e-mail del medico curante"
+        android:inputType="textPassword"
+        android:textColorHint="@color/white"/>
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register" />
+        android:text="--> Avanti" />
     <TextView
         android:id="@+id/loginTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="15dp"
         android:text="Hai già un account?"
         android:textColor="@color/white"/>
 </LinearLayout>
+<!-- <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Dati prima persona fidata:"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp" />
+
+        <EditText
+                android:id="@+id/NomePersoneFidate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="16dp"
+                android:ems="10"
+                android:hint="Nome"
+                android:inputType="textPassword"
+                android:textColorHint="@color/white" />
+
+    <EditText
+        android:id="@+id/CognomePersoneFidate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:hint="Cognome"
+        android:inputType="textPassword"
+        android:textColorHint="@color/white" />
+
+    <EditText
+        android:id="@+id/telefonoPersoneFidate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:hint="numero di telefono"
+        android:inputType="textPassword"
+        android:textColorHint="@color/white"/>
+-->
