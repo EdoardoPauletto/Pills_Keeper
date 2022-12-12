@@ -22,6 +22,7 @@ class SingUpActivity : AppCompatActivity() {
     lateinit var nameEditText: EditText
     lateinit var emailEditText: EditText
     lateinit var passwordEditText: EditText
+    //lateinit var emailMedico: EditText
     lateinit var loginTextView: TextView
     //persone fidate (da 1 a n) nome, cognome, ruolo(figlio,ecc)
     //numero di cell di queste persone
@@ -36,6 +37,7 @@ class SingUpActivity : AppCompatActivity() {
         registerButton.setOnClickListener { onSignUpClick() }
         loginTextView = findViewById<TextView>(R.id.loginTextView)
         loginTextView.setOnClickListener { onLoginClick() }
+
     }
 
     private fun onLoginClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
@@ -44,9 +46,17 @@ class SingUpActivity : AppCompatActivity() {
         finish()
     }
 
+    private fun NextClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
+        val intent = Intent(this, prima_persona_fidata::class.java)
+        startActivity(intent)
+        finish()
+    }
+
     private fun onSignUpClick() {
         emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
         val email = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi
+       /* emailMedico = findViewById<EditText>(R.id.emailMedico) //prendo i valori
+        val emailM = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi*/
         passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val password = passwordEditText.text.toString().trim()
         nameEditText = findViewById<EditText>(R.id.nameEditText)
@@ -63,6 +73,10 @@ class SingUpActivity : AppCompatActivity() {
             passwordEditText.error = "Inserisci password"
             return
         }
+        /*if(emailM.isEmpty()){
+            emailMedico.error = "Inserisci l'email del medico curante"
+            return
+        }*/
         createUser(userName, email, password) //ha senso passare ad un altra funzione...?
     }
 
@@ -77,6 +91,7 @@ class SingUpActivity : AppCompatActivity() {
                     userMap["name"] = userName
                     userMap["email"] = email
                     userMap["password"] = password
+                    //userMap["email medico"] = emailM
                     val database = FirebaseDatabase.getInstance().getReference("Users").child(uid) //lo salvo nel RealTimeDB -> Users/emailUtente
                     database.setValue(userMap).addOnCompleteListener { task ->
                         if (task.isSuccessful) { //se tutto va a buon fine, vado nel Main

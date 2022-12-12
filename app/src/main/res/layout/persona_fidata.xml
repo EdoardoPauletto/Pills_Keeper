@@ -6,12 +6,13 @@
     android:background="@color/purple_200"
     android:orientation="vertical"
     android:padding="16dp">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:text="Dati persona fidata:"
         android:layout_gravity="center"
+        android:layout_marginTop="130dp"
+        android:text="Dati prima persona fidata:"
         android:textColor="#FFFFFF"
         android:textSize="20dp" />
 
@@ -20,7 +21,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"
         android:layout_gravity="center"
         android:ems="10"
         android:hint="Nome"
@@ -31,9 +31,7 @@
         android:id="@+id/CognomePersoneFidate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
         android:ems="10"
         android:hint="Cognome"
         android:inputType="textPassword"
@@ -48,13 +46,14 @@
         android:ems="10"
         android:hint="numero di telefono"
         android:inputType="textPassword"
-        android:textColorHint="@color/white"/>
+        android:textColorHint="@color/white" />
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
+        android:backgroundTint="@color/purple_200"
         style="@android:style/ButtonBar">
 
         <Button
@@ -62,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="X elimina" />
+            android:text="<-- elimina" />
 
         <Button
             android:id="@+id/cancelButton"
@@ -79,4 +78,5 @@
             android:text="--> Avanti" />
 
     </LinearLayout>
+
 </LinearLayout>

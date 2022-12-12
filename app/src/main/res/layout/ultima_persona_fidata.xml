@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="130dp"
-        android:text="Dati prima persona fidata:"
+        android:text="Dati ultima persona fidata:"
         android:layout_gravity="center"
         android:textColor="#FFFFFF"
         android:textSize="20dp" />
@@ -61,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="<-- Indietro" />
+            android:text="<-- Elimina" />
 
         <Button
             android:id="@+id/cancelButton"
