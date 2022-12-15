@@ -9,7 +9,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:textSize="20dp"
+        android:text="Nessuna pillola aggiunta!!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,6 +25,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="30dp"
         app:srcCompat="@drawable/add_24"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="255dp"
+        android:layout_height="146dp"
+        app:srcCompat="@drawable/images"
+        tools:layout_editor_absoluteX="78dp"
+        tools:layout_editor_absoluteY="214dp"
         tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
