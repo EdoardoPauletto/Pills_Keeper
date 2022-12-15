@@ -9,33 +9,32 @@ import android.widget.Button
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class prima_persona_fidata : AppCompatActivity() {
+class persona_fidata : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
-    lateinit var BackButton: Button
-    lateinit var NextButton: Button
-    lateinit var AddPersonButton: Button
+    lateinit var CancelButton: Button
+    lateinit var SaveButton: Button
+    lateinit var MiddleButton: Button
 
-    //@SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.prima_persona_fidata)
+        setContentView(R.layout.persona_fidata)
         auth = Firebase.auth //inizializza col db
-        AddPersonButton = findViewById<Button>(R.id.AddPersonButton)
-        AddPersonButton.setOnClickListener {
+        MiddleButton = findViewById<Button>(R.id.middleButton)
+        MiddleButton.setOnClickListener {
             onAddPersonClick()
         }
-        BackButton = findViewById<Button>(R.id.BackButton)
-        BackButton.setOnClickListener {
-            onBackClick()
+        CancelButton = findViewById<Button>(R.id.cancelButton)
+        CancelButton.setOnClickListener {
+            onCancelClick()
         }
-        NextButton = findViewById<Button>(R.id.NextButton)
-        NextButton.setOnClickListener {
-            onNextClick()
+        SaveButton = findViewById<Button>(R.id.saveButton)
+        SaveButton.setOnClickListener {
+            onSaveClick()
         }
     }
 
-    private fun onBackClick() { //quando pulsante cliccato
-        val intent = Intent(this, MainActivity::class.java)
+    private fun onCancelClick() { //quando pulsante cliccato
+        val intent = Intent(this, persona_fidata::class.java)
         startActivity(intent)
         finish()
     }
@@ -45,7 +44,7 @@ class prima_persona_fidata : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
-    private fun onNextClick() { //quando pulsante cliccato
+    private fun onSaveClick() { //quando pulsante cliccato
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()

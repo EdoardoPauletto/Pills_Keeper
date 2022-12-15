@@ -57,25 +57,25 @@
         style="@android:style/ButtonBar">
 
         <Button
-            android:id="@+id/saveButton"
+            android:id="@+id/BackButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="<-- Indietro" />
+            android:text="    Indietro" />
 
         <Button
-            android:id="@+id/cancelButton"
+            android:id="@+id/AddPersonButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Aggiungi un'altro" />
 
         <Button
-            android:id="@+id/middleButton"
+            android:id="@+id/NextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="--> Avanti" />
+            android:text="    Avanti" />
 
     </LinearLayout>
 </LinearLayout>

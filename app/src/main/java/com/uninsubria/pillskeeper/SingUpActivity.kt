@@ -23,10 +23,9 @@ class SingUpActivity : AppCompatActivity() {
     lateinit var emailEditText: EditText
     lateinit var passwordEditText: EditText
     //lateinit var emailMedico: EditText
+    //lateinit var cellulare: EditText
     lateinit var loginTextView: TextView
     //persone fidate (da 1 a n) nome, cognome, ruolo(figlio,ecc)
-    //numero di cell di queste persone
-    //mail medico curante
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,17 +45,19 @@ class SingUpActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun NextClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
+    /*private fun NextClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
         val intent = Intent(this, prima_persona_fidata::class.java)
         startActivity(intent)
         finish()
-    }
+    }*/
 
     private fun onSignUpClick() {
         emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
         val email = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi
-       /* emailMedico = findViewById<EditText>(R.id.emailMedico) //prendo i valori
-        val emailM = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi*/
+       /* emailMedico = findViewById<EditText>(R.id.emailMedico)
+        val emailM = emailEditText.text.toString().trim()
+        cellulare = findViewById<EditText>(R.id.cellulare)
+        val cell = emailEditText.text.toString().trim()*/
         passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val password = passwordEditText.text.toString().trim()
         nameEditText = findViewById<EditText>(R.id.nameEditText)
@@ -76,6 +77,10 @@ class SingUpActivity : AppCompatActivity() {
         /*if(emailM.isEmpty()){
             emailMedico.error = "Inserisci l'email del medico curante"
             return
+        }
+        if(cell.isEmpty()){
+            cellulare.error = "Inserisci il tuo numero di cellulare"
+            return
         }*/
         createUser(userName, email, password) //ha senso passare ad un altra funzione...?
     }
@@ -92,6 +97,7 @@ class SingUpActivity : AppCompatActivity() {
                     userMap["email"] = email
                     userMap["password"] = password
                     //userMap["email medico"] = emailM
+                    //userMap["numero di cellulare"] = cell
                     val database = FirebaseDatabase.getInstance().getReference("Users").child(uid) //lo salvo nel RealTimeDB -> Users/emailUtente
                     database.setValue(userMap).addOnCompleteListener { task ->
                         if (task.isSuccessful) { //se tutto va a buon fine, vado nel Main

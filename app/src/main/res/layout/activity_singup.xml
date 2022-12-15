@@ -50,6 +50,15 @@
         android:inputType="textPassword"
         android:textColorHint="@color/white"/>
     <EditText
+        android:id="@+id/cellulare"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:ems="10"
+        android:hint="Numero di telefono cellulare"
+        android:inputType="textPassword"
+        android:textColorHint="@color/white"/>
+    <EditText
         android:id="@+id/emailMedico"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
