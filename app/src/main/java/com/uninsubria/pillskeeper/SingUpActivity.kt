@@ -84,7 +84,7 @@ class SingUpActivity : AppCompatActivity() {
         }
         val intent = Intent(this, prima_persona_fidata::class.java)
         startActivity(intent)
-        //createUser(userName, email, password) //ha senso passare ad un altra funzione...?
+        createUser(userName, email, password) //ha senso passare ad un altra funzione...?
     }
 
     private fun createUser(userName: String, email: String, password: String) {

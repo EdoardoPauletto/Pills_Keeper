@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.uninsubria.pillskeeper">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,12 +18,20 @@
         android:theme="@style/Theme.PillsKeeper"
         tools:targetApi="31">
         <activity
+            android:name=".forgotPassword"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".AddPillActivity"
             android:exported="false">
+
             <!-- aggiunte per il tasto indietro -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.uninsubria.pillskeeper.MainActivity"/>
+                android:value="com.uninsubria.pillskeeper.MainActivity" />
         </activity>
         <activity
             android:name=".SingUpActivity"
@@ -43,7 +55,5 @@
             </intent-filter>
         </activity>
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+
 </manifest>

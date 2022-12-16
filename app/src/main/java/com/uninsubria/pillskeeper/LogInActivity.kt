@@ -77,7 +77,7 @@ class LogInActivity : AppCompatActivity() {
             }
     }
 
-    private fun onForgotClick() { //da fare seriamente
+    /*private fun onForgotClick() { //da fare seriamente
         val builder = AlertDialog.Builder(this)
         with(builder) {
             setTitle("Opzione non valida")
@@ -85,6 +85,10 @@ class LogInActivity : AppCompatActivity() {
             setPositiveButton("OK", null)
             show()
         }
-        TODO("Not yet implemented")
+    }*/
+    private fun onForgotClick(){
+        val intent = Intent(this, forgotPassword::class.java)
+        startActivity(intent)
+        finish()
     }
 }
