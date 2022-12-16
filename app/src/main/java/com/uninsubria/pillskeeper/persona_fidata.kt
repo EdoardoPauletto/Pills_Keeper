@@ -1,6 +1,5 @@
 package com.uninsubria.pillskeeper
 
-import android.annotation.SuppressLint
 import com.google.firebase.auth.FirebaseAuth
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -11,38 +10,41 @@ import com.google.firebase.ktx.Firebase
 
 class persona_fidata : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
-    lateinit var CancelButton: Button
-    lateinit var SaveButton: Button
-    lateinit var MiddleButton: Button
+    lateinit var cancelButton: Button
+    lateinit var saveButton: Button
+    lateinit var middleButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.persona_fidata)
         auth = Firebase.auth //inizializza col db
-        MiddleButton = findViewById<Button>(R.id.middleButton)
-        MiddleButton.setOnClickListener {
+        middleButton = findViewById<Button>(R.id.middleButton)
+        middleButton.setOnClickListener {
             onAddPersonClick()
         }
-        CancelButton = findViewById<Button>(R.id.cancelButton)
-        CancelButton.setOnClickListener {
+        cancelButton = findViewById<Button>(R.id.cancelButton)
+        cancelButton.setOnClickListener {
             onCancelClick()
         }
-        SaveButton = findViewById<Button>(R.id.saveButton)
-        SaveButton.setOnClickListener {
+        saveButton = findViewById<Button>(R.id.saveButton)
+        saveButton.setOnClickListener {
             onSaveClick()
         }
+        //leggere quanti utenti già salvati
+        //stampare i rimanenti
     }
 
     private fun onCancelClick() { //quando pulsante cliccato
-        val intent = Intent(this, persona_fidata::class.java)
-        startActivity(intent)
+        //val intent = Intent(this, persona_fidata::class.java)
+        //startActivity(intent)
         finish()
     }
 
     private fun onAddPersonClick() { //quando pulsante cliccato
+        //se già a 5, o disattivare pulsante oppure msg errore
         val intent = Intent(this, persona_fidata::class.java)
         startActivity(intent)
-        finish()
+        //finish()
     }
     private fun onSaveClick() { //quando pulsante cliccato
         val intent = Intent(this, MainActivity::class.java)

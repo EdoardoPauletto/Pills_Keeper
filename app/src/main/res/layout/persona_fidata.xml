@@ -58,25 +58,25 @@
         style="@android:style/ButtonBar">
 
         <Button
-            android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="    elimina" />
-
-        <Button
             android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Aggiungi un'altro" />
+            android:text="← elimina" />
 
         <Button
             android:id="@+id/middleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="   Avanti" />
+            android:text="Aggiungi un'altro" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="→ Avanti" />
 
     </LinearLayout>
 

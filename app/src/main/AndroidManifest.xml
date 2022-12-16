@@ -28,6 +28,12 @@
             android:name=".LogInActivity"
             android:exported="false" />
         <activity
+            android:name=".prima_persona_fidata"
+            android:exported="false" />
+        <activity
+            android:name=".persona_fidata"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

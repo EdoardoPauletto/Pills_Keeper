@@ -56,7 +56,7 @@
         android:layout_marginBottom="12dp"
         android:ems="10"
         android:hint="Numero di telefono cellulare"
-        android:inputType="textPassword"
+        android:inputType="number"
         android:textColorHint="@color/white"/>
     <EditText
         android:id="@+id/emailMedico"
@@ -65,7 +65,7 @@
         android:layout_marginBottom="12dp"
         android:ems="10"
         android:hint="Indirizzo e-mail del medico curante"
-        android:inputType="textPassword"
+        android:inputType="textEmailAddress"
         android:textColorHint="@color/white"/>
     <Button
         android:id="@+id/registerButton"
