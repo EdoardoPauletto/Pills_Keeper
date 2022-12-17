@@ -3,6 +3,10 @@ package com.uninsubria.pillskeeper
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.telephony.SmsManager
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -19,6 +23,31 @@ class MainActivity : AppCompatActivity() {
         addButton.setOnClickListener {
             onAddClick()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.rev_menu,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.sms -> SendSMS()
+            //R.id.email -> sendEmail()
+            R.id.logout -> onLoginClick()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    @Suppress("DEPRECATION")
+    private fun SendSMS(){
+        val obj : SmsManager = SmsManager.getDefault()
+        obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)
+    }
+
+    private fun onLoginClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
+        val intent = Intent(this, LogInActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun onAddClick() { //quando pulsante cliccato

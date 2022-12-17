@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/sms"
+        android:title="/invia sms a persona di fiducia"
+        app:showAsAction="never"/>
+    <item android:id="@+id/email"
+        android:title="invia e-mail a medico curante"
+        app:showAsAction="never"/>
+    <item android:id="@+id/PF"
+        android:title="elimina persona fidata"
+        app:showAsAction="never"/>
+    <item android:id="@+id/geo"
+        android:title="trova la farmacia più vivina"
+        app:showAsAction="never"/>
+    <item android:id="@+id/logout"
+        android:title="Esci"
+        app:showAsAction="never"/>
+</menu>
