@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/sms"
-        android:title="/invia sms a persona di fiducia"
+        android:title="invia sms a persona di fiducia"
         app:showAsAction="never"/>
     <item android:id="@+id/email"
         android:title="invia e-mail a medico curante"

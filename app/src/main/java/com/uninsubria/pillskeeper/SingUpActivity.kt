@@ -8,7 +8,6 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -52,16 +51,16 @@ class SingUpActivity : AppCompatActivity() {
     }*/
 
     private fun onSignUpClick() {
-        emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
-        val email = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi (MEGLIO FARE IN UN UNICO PASSAGGIO)
-        emailMedico = findViewById<EditText>(R.id.emailMedico)
-        val emailM = emailMedico.text.toString().trim()
-        cellulare = findViewById<EditText>(R.id.cellulare)
-        val cell = cellulare.text.toString().trim()
-        passwordEditText = findViewById<EditText>(R.id.passwordEditText)
-        val password = passwordEditText.text.toString().trim()
         nameEditText = findViewById<EditText>(R.id.nameEditText)
-        val userName = nameEditText.text.toString().trim()
+        emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
+        passwordEditText = findViewById<EditText>(R.id.passwordEditText)
+        cellulare = findViewById<EditText>(R.id.cellulare)
+        emailMedico = findViewById<EditText>(R.id.emailMedico)
+        val userName = nameEditText.text.toString().trim()//trim rimuove gli spazi bianchi
+        val email = emailEditText.text.toString().trim()
+        val password = passwordEditText.text.toString().trim()
+        val cell = cellulare.text.toString().trim()
+        val emailM = emailMedico.text.toString().trim()
         if (userName.isEmpty()) { //controlli basilari
             nameEditText.error = "Inserisci userName" //...poi da cambiare con i dati che davvero ci servono
             return
@@ -82,39 +81,36 @@ class SingUpActivity : AppCompatActivity() {
             emailMedico.error = "Inserisci l'email del medico curante"
             return
         }
-        val intent = Intent(this, prima_persona_fidata::class.java)
-        startActivity(intent)
-        createUser(userName, email, password) //ha senso passare ad un altra funzione...?
+        createUser(userName, email, password, cell, emailM) //ha senso passare ad un altra funzione...?
+        //val intent = Intent(this, prima_persona_fidata::class.java)
+        //startActivity(intent)
     }
 
-    private fun createUser(userName: String, email: String, password: String) {
+    private fun createUser(userName: String, email: String, password: String, cell: String, emailMedico: String) {
+
+        var utente = User(userName, email, password, cell, emailMedico)//creo un oggetto utente
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) { // Se registrato correttamente, lo scrivo nel log e...
                     Log.d(TAG, "createUserWithEmail:success")
                     val currentUser = auth.currentUser
                     val uid = currentUser!!.uid //prendo l'ID univoco creato automaticamente (e per forza esistente) !!! MEGLIO LA MAIL
-                    val userMap = HashMap<String, String>() //faccio chiave,valore con name=...
-                    userMap["name"] = userName
-                    userMap["email"] = email
-                    userMap["password"] = password
-                    //userMap["email medico"] = emailM
-                    //userMap["numero di cellulare"] = cell
                     val database = FirebaseDatabase.getInstance().getReference("Users").child(uid) //lo salvo nel RealTimeDB -> Users/emailUtente
-                    database.setValue(userMap).addOnCompleteListener { task ->
+                    database.setValue(utente.userMap()).addOnCompleteListener { task ->
                         if (task.isSuccessful) { //se tutto va a buon fine, vado nel Main
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                             finish()
                         }
                     }
-                } else { // Se registrazione fallisce, mostro un toast !!! mentre nel login mostravo un Alert
+                } else { // Se registrazione fallisce, mostro un Alert, devo anche cancellare tutto!!!!!!!!
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     //Toast.makeText(baseContext, "Autenticazione fallita", Toast.LENGTH_SHORT).show()
                     val builder = AlertDialog.Builder(this)
                     with(builder) {
                         setTitle("Creazione di un nuovo utente fallita fallita")
-                        setMessage(task.exception?.message) //tradurre ogni possibile eccezione
+                        setMessage(task.exception?.message) //tradurre ogni possibile eccezione?
                         setPositiveButton("OK", null)
                         show()
                     }

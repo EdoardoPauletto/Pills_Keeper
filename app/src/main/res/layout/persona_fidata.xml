@@ -24,7 +24,7 @@
         android:layout_gravity="center"
         android:ems="10"
         android:hint="Nome"
-        android:inputType="textPassword"
+        android:inputType="textPersonName"
         android:textColorHint="@color/white" />
 
     <EditText
@@ -34,7 +34,7 @@
         android:layout_gravity="center"
         android:ems="10"
         android:hint="Cognome"
-        android:inputType="textPassword"
+        android:inputType="textPersonName"
         android:textColorHint="@color/white" />
 
     <EditText
@@ -44,8 +44,8 @@
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
         android:ems="10"
-        android:hint="numero di telefono"
-        android:inputType="textPassword"
+        android:hint="Numero di telefono"
+        android:inputType="phone"
         android:textColorHint="@color/white" />
 
     <LinearLayout

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.telephony.SmsManager
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -32,15 +31,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.sms -> SendSMS()
+            R.id.sms -> sendSMS()
             //R.id.email -> sendEmail()
-            R.id.logout -> onLoginClick()
+            R.id.logout -> onLoginClick() //da sistemare
         }
         return super.onOptionsItemSelected(item)
     }
     @Suppress("DEPRECATION")
-    private fun SendSMS(){
-        val obj : SmsManager = SmsManager.getDefault()
+    private fun sendSMS(){
+        val obj : SmsManager = SmsManager.getDefault() //a me da errore
         obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)
     }
 
