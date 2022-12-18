@@ -40,10 +40,10 @@
             android:name=".LogInActivity"
             android:exported="false" />
         <activity
-            android:name=".prima_persona_fidata"
+            android:name=".PrimaPersonaFidata"
             android:exported="false" />
         <activity
-            android:name=".persona_fidata"
+            android:name=".PersonaFidata"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

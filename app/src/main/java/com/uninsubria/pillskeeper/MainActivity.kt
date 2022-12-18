@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId){
             R.id.sms -> sendSMS()
             //R.id.email -> sendEmail()
-            R.id.logout -> onLoginClick() //da sistemare
+            R.id.logout -> onLogoutClick()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -47,6 +47,12 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, LogInActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun onLogoutClick(){
+        //auth.signOut() ne basta uno dei due, da capire perchè
+        Firebase.auth.signOut()
+        onStart()
     }
 
     private fun onAddClick() { //quando pulsante cliccato

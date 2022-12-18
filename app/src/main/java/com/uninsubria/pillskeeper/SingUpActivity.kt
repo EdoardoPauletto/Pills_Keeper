@@ -13,10 +13,11 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 
+var utente = User()
+
 class SingUpActivity : AppCompatActivity() {
     //inizializzazione variabili
     private lateinit var auth: FirebaseAuth
-    private var TAG = "SignUpActivity"
     lateinit var registerButton: Button
     lateinit var nameEditText: EditText
     lateinit var emailEditText: EditText
@@ -81,40 +82,9 @@ class SingUpActivity : AppCompatActivity() {
             emailMedico.error = "Inserisci l'email del medico curante"
             return
         }
-        createUser(userName, email, password, cell, emailM) //ha senso passare ad un altra funzione...?
-        //val intent = Intent(this, prima_persona_fidata::class.java)
-        //startActivity(intent)
-    }
-
-    private fun createUser(userName: String, email: String, password: String, cell: String, emailMedico: String) {
-
-        var utente = User(userName, email, password, cell, emailMedico)//creo un oggetto utente
-
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) { // Se registrato correttamente, lo scrivo nel log e...
-                    Log.d(TAG, "createUserWithEmail:success")
-                    val currentUser = auth.currentUser
-                    val uid = currentUser!!.uid //prendo l'ID univoco creato automaticamente (e per forza esistente) !!! MEGLIO LA MAIL
-                    val database = FirebaseDatabase.getInstance().getReference("Users").child(uid) //lo salvo nel RealTimeDB -> Users/emailUtente
-                    database.setValue(utente.userMap()).addOnCompleteListener { task ->
-                        if (task.isSuccessful) { //se tutto va a buon fine, vado nel Main
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
-                            finish()
-                        }
-                    }
-                } else { // Se registrazione fallisce, mostro un Alert, devo anche cancellare tutto!!!!!!!!
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    //Toast.makeText(baseContext, "Autenticazione fallita", Toast.LENGTH_SHORT).show()
-                    val builder = AlertDialog.Builder(this)
-                    with(builder) {
-                        setTitle("Creazione di un nuovo utente fallita fallita")
-                        setMessage(task.exception?.message) //tradurre ogni possibile eccezione?
-                        setPositiveButton("OK", null)
-                        show()
-                    }
-                }
-            }
+        utente = User(userName, email, password, cell, emailM)//creo un oggetto utente
+        //createUser(userName, email, password, cell, emailM) //ha senso passare ad un altra funzione...?
+        val intent = Intent(this, PrimaPersonaFidata::class.java)
+        startActivity(intent)
     }
 }

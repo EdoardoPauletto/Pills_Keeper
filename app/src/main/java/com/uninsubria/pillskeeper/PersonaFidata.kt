@@ -8,7 +8,7 @@ import android.widget.Button
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class persona_fidata : AppCompatActivity() {
+class PersonaFidata : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
     lateinit var cancelButton: Button
     lateinit var saveButton: Button
@@ -42,7 +42,7 @@ class persona_fidata : AppCompatActivity() {
 
     private fun onAddPersonClick() { //quando pulsante cliccato
         //se già a 5, o disattivare pulsante oppure msg errore
-        val intent = Intent(this, persona_fidata::class.java)
+        val intent = Intent(this, PersonaFidata::class.java)
         startActivity(intent)
         //finish()
     }

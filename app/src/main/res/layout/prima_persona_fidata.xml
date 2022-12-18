@@ -16,7 +16,7 @@
         android:textSize="20dp" />
 
     <EditText
-        android:id="@+id/NomePersoneFidate"
+        android:id="@+id/NomePersonaFidata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
@@ -27,7 +27,7 @@
         android:textColorHint="@color/white" />
 
     <EditText
-        android:id="@+id/CognomePersoneFidate"
+        android:id="@+id/CognomePersonaFidata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -37,7 +37,7 @@
         android:textColorHint="@color/white" />
 
     <EditText
-        android:id="@+id/telefonoPersoneFidate"
+        android:id="@+id/telefonoPersonaFidata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

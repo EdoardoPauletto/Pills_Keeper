@@ -96,7 +96,7 @@ class AddPillActivity : AppCompatActivity() {
                     handler.postDelayed({ mProgressBar.progress = 0 }, 500)
                     Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
 
-                    //chiamo costruttore e prendo l'edit text col nome del farmaco e IL NOME DELL'IMMAGINE ??? percorso diverso per ogni utente?
+                    //chiamo costruttore e prendo l'edit text col nome del farmaco e IL percorso DELL'IMMAGINE (diverso per ogni utente)
                     val upload = Upload(mEditTextFileName.text.toString().trim { it <= ' ' }, taskSnapshot.storage.path)
                     //per avere anche i meta data (URL,name)
                     //crea nuova entrata nel db con unico id
@@ -106,7 +106,6 @@ class AddPillActivity : AppCompatActivity() {
 
                 } //non finisce, c'è il punto
                 .addOnFailureListener { e -> //azioni quando upload non avviene
-                    //NON solo this perchè siamo in una classe interna
                     Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                 } //non finisce, c'è il punto
                 .addOnProgressListener { tasksnapshot -> //quando upload sta avvenendo, voglio aggiornare la progress bar con la percentuale corrente
