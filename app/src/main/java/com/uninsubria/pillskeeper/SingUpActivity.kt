@@ -1,16 +1,13 @@
 package com.uninsubria.pillskeeper
 
-import android.app.AlertDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 
 var utente = User()
@@ -20,6 +17,7 @@ class SingUpActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     lateinit var registerButton: Button
     lateinit var nameEditText: EditText
+    lateinit var surnameEditText: EditText
     lateinit var emailEditText: EditText
     lateinit var passwordEditText: EditText
     lateinit var emailMedico: EditText
@@ -52,18 +50,24 @@ class SingUpActivity : AppCompatActivity() {
     }*/
 
     private fun onSignUpClick() {
-        nameEditText = findViewById<EditText>(R.id.nameEditText)
-        emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
-        passwordEditText = findViewById<EditText>(R.id.passwordEditText)
-        cellulare = findViewById<EditText>(R.id.cellulare)
-        emailMedico = findViewById<EditText>(R.id.emailMedico)
-        val userName = nameEditText.text.toString().trim()//trim rimuove gli spazi bianchi
+        nameEditText = findViewById(R.id.Nome)
+        surnameEditText = findViewById(R.id.Cognome)
+        emailEditText = findViewById(R.id.emailEditText) //prendo i valori
+        passwordEditText = findViewById(R.id.passwordEditText)
+        cellulare = findViewById(R.id.cellulare)
+        emailMedico = findViewById(R.id.emailMedico)
+        val name = nameEditText.text.toString().trim()//trim rimuove gli spazi bianchi
+        val surname = surnameEditText.text.toString().trim()
         val email = emailEditText.text.toString().trim()
         val password = passwordEditText.text.toString().trim()
         val cell = cellulare.text.toString().trim()
         val emailM = emailMedico.text.toString().trim()
-        if (userName.isEmpty()) { //controlli basilari
-            nameEditText.error = "Inserisci userName" //...poi da cambiare con i dati che davvero ci servono
+        if (name.isEmpty()) { //controlli basilari
+            nameEditText.error = "Inserisci nome" //...poi da cambiare con i dati che davvero ci servono
+            return
+        }
+        if (email.isEmpty()) {
+            emailEditText.error = "Inserisci cognome"
             return
         }
         if (email.isEmpty()) {
@@ -82,7 +86,7 @@ class SingUpActivity : AppCompatActivity() {
             emailMedico.error = "Inserisci l'email del medico curante"
             return
         }
-        utente = User(userName, email, password, cell, emailM)//creo un oggetto utente
+        utente = User(name, surname, email, password, cell, emailM)//creo un oggetto utente
         //createUser(userName, email, password, cell, emailM) //ha senso passare ad un altra funzione...?
         val intent = Intent(this, PrimaPersonaFidata::class.java)
         startActivity(intent)
