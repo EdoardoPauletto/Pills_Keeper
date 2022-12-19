@@ -4,13 +4,23 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.telephony.SmsManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
@@ -20,29 +30,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         auth = Firebase.auth //inizializza col db
-        addButton = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.floatingActionButton)
+        addButton = findViewById(R.id.floatingActionButton)
         addButton.setOnClickListener { onAddClick() }
-
-        // getting the recyclerview by its id
-        val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
-
-        // this creates a vertical layout Manager
-        recyclerview.layoutManager = LinearLayoutManager(this)
-
-        // ArrayList of class ItemsViewModel
-        val data = ArrayList<Upload>()
-
-        // This loop will create 20 Views containing
-        // the image with the count of view
-        for (i in 1..20) {
-            data.add(Upload("Item " + i, "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656335148706.png?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
-        }
-
-        // This will pass the ArrayList to our Adapter
-        val adapter = PilloleAdapter(data)
-
-        // Setting the Adapter with the recyclerview
-        recyclerview.adapter = adapter
+        caricaFarmaci()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -62,12 +52,6 @@ class MainActivity : AppCompatActivity() {
     private fun sendSMS(){
         val obj : SmsManager = SmsManager.getDefault() //a me da errore
         obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)
-    }
-
-    private fun onLoginClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
-        val intent = Intent(this, LogInActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 
     private fun onLogoutClick(){
@@ -130,4 +114,46 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }*/
+
+    private fun caricaFarmaci(){
+        val farmaciDB = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
+        farmaciDB.child("farmaci/").addValueEventListener(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(!snapshot.exists()) {
+                    Toast.makeText(baseContext, "Non c'è cartella farmaci", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(baseContext, "C'è tutto!!!", Toast.LENGTH_SHORT).show()
+                    findViewById<ImageView>(R.id.imageView2).isVisible = false //disattivo testo e immagine
+                    findViewById<TextView>(R.id.textView).isVisible = false
+                    val mStorageRef = FirebaseStorage.getInstance().reference
+                    // prendo la recycleView
+                    val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
+
+                    // this creates a vertical layout Manager
+                    recyclerview.layoutManager = LinearLayoutManager(MainActivity())
+
+                    // ArrayList of class ItemsViewModel
+                    val data = ArrayList<Upload>()
+                    for (f in snapshot.children){
+                        val tmp = f.getValue(Upload::class.java)
+                        //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
+                        data.add(tmp!!)
+                    }
+                    // This loop will create 20 Views containing
+                    // the image with the count of view
+                    //data.add(Upload("Item ", "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656494538372.jpg?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
+
+                    // This will pass the ArrayList to our Adapter
+                    val adapter = PilloleAdapter(data)
+
+                    // Setting the Adapter with the recyclerview
+                    recyclerview.adapter = adapter
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("TAG", error.message); //Don't ignore errors!
+            }
+        })
+    }
 }

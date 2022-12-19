@@ -5,43 +5,49 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
-class PilloleAdapter(private val mList: List<Upload>): RecyclerView.Adapter<PilloleAdapter.ViewHolder>() {
-    // create new views
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+
+class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
+    // crea nuove views
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElementiVista {
         // inflates the card_view_design view
         // that is used to hold list item
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_view_design, parent, false)
 
-        return ViewHolder(view)
+        return ElementiVista(view)
     }
 
-    // binds the list items to a view
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    // associa gli elementi dell'elenco a una vista
+    override fun onBindViewHolder(holder: ElementiVista, posizione: Int) {
 
-        val ItemsViewModel = mList[position]
+        val elemento = lista[posizione]
 
-        // sets the image to the imageview from our itemHolder class
-        holder.imageView.setImageURI(ItemsViewModel.mImageUrl?.toUri())
-        Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656335148706.png?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e").into(holder.imageView)
-        //holder.imageView.setImageResource(ItemsViewModel.mImageUrl)
-
-        // sets the text to the textview from our itemHolder class
-        holder.textView.text = ItemsViewModel.name
-
+        // imposta l'immagine "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656335148706.png?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
+        //Picasso.get().load(elemento.mImageUrl).into(holder.imageView)
+        val s = FirebaseStorage.getInstance().getReferenceFromUrl("gs://prove-b822e.appspot.com" + elemento.mImageUrl)
+        s.downloadUrl.addOnSuccessListener { uri ->
+            // Pass it to Picasso to download, show in ImageView and caching
+            Picasso.get().load(uri.toString()).into(holder.imageView)
+        }.addOnFailureListener {
+            // Handle any errors
+        }
+        // imposta il testo
+        holder.textView.text = elemento.name
     }
 
-    // return the number of the items in the list
+    // restituisce il numero di elementi della lista
     override fun getItemCount(): Int {
-        return mList.size
+        return lista.size
     }
 
     // Holds the views for adding it to image and text
-    class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+    class ElementiVista(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
     }
