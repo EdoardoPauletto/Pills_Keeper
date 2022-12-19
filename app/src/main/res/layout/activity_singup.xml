@@ -26,12 +26,26 @@
         android:textSize="44sp"
         android:textStyle="bold"/>
     <EditText
-        android:id="@+id/nameEditText"
+        android:id="@+id/NomePersonaFidata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="User Name"
+        android:hint="Nome"
+        android:inputType="textCapWords"
+        android:minHeight="48dp"
+        android:textColorHint="@color/white" />
+
+    <EditText
+        android:id="@+id/CognomePersonaFidata"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:ems="10"
+        android:hint="Cognome"
+        android:inputType="textCapWords"
+        android:minHeight="48dp"
         android:textColorHint="@color/white" />
     <EditText
         android:id="@+id/emailEditText"
@@ -55,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:ems="10"
+        android:maxLength="10"
         android:hint="Numero di telefono cellulare"
         android:inputType="phone"
         android:textColorHint="@color/white"/>
