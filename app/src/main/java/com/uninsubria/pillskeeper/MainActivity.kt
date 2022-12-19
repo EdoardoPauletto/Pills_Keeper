@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.telephony.SmsManager
 import android.view.Menu
 import android.view.MenuItem
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -19,9 +21,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         auth = Firebase.auth //inizializza col db
         addButton = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.floatingActionButton)
-        addButton.setOnClickListener {
-            onAddClick()
+        addButton.setOnClickListener { onAddClick() }
+
+        // getting the recyclerview by its id
+        val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
+
+        // this creates a vertical layout Manager
+        recyclerview.layoutManager = LinearLayoutManager(this)
+
+        // ArrayList of class ItemsViewModel
+        val data = ArrayList<Upload>()
+
+        // This loop will create 20 Views containing
+        // the image with the count of view
+        for (i in 1..20) {
+            data.add(Upload("Item " + i, "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656335148706.png?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
         }
+
+        // This will pass the ArrayList to our Adapter
+        val adapter = PilloleAdapter(data)
+
+        // Setting the Adapter with the recyclerview
+        recyclerview.adapter = adapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

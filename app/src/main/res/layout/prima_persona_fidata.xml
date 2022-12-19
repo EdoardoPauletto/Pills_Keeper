@@ -19,11 +19,12 @@
         android:id="@+id/NomePersonaFidata"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_gravity="center"
+        android:layout_marginTop="10dp"
         android:ems="10"
         android:hint="Nome"
         android:inputType="textPersonName"
+        android:minHeight="48dp"
         android:textColorHint="@color/white" />
 
     <EditText
@@ -34,6 +35,7 @@
         android:ems="10"
         android:hint="Cognome"
         android:inputType="textPersonName"
+        android:minHeight="48dp"
         android:textColorHint="@color/white" />
 
     <EditText
@@ -45,7 +47,8 @@
         android:ems="10"
         android:hint="numero di telefono"
         android:inputType="phone"
-        android:textColorHint="@color/white"/>
+        android:minHeight="48dp"
+        android:textColorHint="@color/white" />
     <LinearLayout
         android:id="@+id/footer"
         android:layout_width="match_parent"

@@ -71,7 +71,7 @@ class AddPillActivity : AppCompatActivity() {
         //resultcode == RESULT_OK se prende l'immagine va alla next line
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) { //se l'utente sceglie un' immagine controlla che non sia nulla
             mImageUri = data.data!! ////return del uri dell'immagine scelta (forziamo non null)
-            Picasso.with(this).load(mImageUri).into(mImageView)
+            Picasso.get().load(mImageUri).into(mImageView)
         }
     }
 
