@@ -28,7 +28,7 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
 
         val elemento = lista[posizione]
 
-        // imposta l'immagine "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656335148706.png?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
+        // imposta l'immagine
         //Picasso.get().load(elemento.mImageUrl).into(holder.imageView)
         val s = FirebaseStorage.getInstance().getReferenceFromUrl("gs://prove-b822e.appspot.com" + elemento.mImageUrl)
         s.downloadUrl.addOnSuccessListener { uri ->

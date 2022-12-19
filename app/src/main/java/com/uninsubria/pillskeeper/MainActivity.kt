@@ -132,15 +132,13 @@ class MainActivity : AppCompatActivity() {
                     // this creates a vertical layout Manager
                     recyclerview.layoutManager = LinearLayoutManager(MainActivity())
 
-                    // ArrayList of class ItemsViewModel
+                    // lista degli elementi da inserire
                     val data = ArrayList<Upload>()
                     for (f in snapshot.children){
                         val tmp = f.getValue(Upload::class.java)
                         //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
                         data.add(tmp!!)
                     }
-                    // This loop will create 20 Views containing
-                    // the image with the count of view
                     //data.add(Upload("Item ", "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656494538372.jpg?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
 
                     // This will pass the ArrayList to our Adapter
