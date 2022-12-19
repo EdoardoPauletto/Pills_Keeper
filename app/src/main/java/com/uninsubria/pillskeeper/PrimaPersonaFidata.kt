@@ -89,6 +89,7 @@ class PrimaPersonaFidata : AppCompatActivity() {
                     database.setValue(utente).addOnCompleteListener { task ->
                         if (task.isSuccessful) { //se tutto va a buon fine, vado nel Main
                             val intent = Intent(this, MainActivity::class.java)
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK) //termina le schede precedenti
                             startActivity(intent)
                             finish()
                         }

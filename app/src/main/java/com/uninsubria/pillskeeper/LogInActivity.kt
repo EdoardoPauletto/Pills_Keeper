@@ -62,6 +62,7 @@ class LogInActivity : AppCompatActivity() {
                 if (task.isSuccessful) { // Se loggato correttamente, lo scrivo nel log
                     Log.d(TAG, "signInWithEmail:success")
                     val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK) //termina le schede precedenti
                     startActivity(intent)
                     finish()
                 } else { // Se fallisce, mostra un messaggio all'utente
@@ -89,6 +90,5 @@ class LogInActivity : AppCompatActivity() {
     private fun onForgotClick(){
         val intent = Intent(this, forgotPassword::class.java)
         startActivity(intent)
-        finish()
     }
 }

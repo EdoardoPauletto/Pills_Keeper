@@ -19,13 +19,10 @@ class forgotPassword : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_forgot_password)
 
+        auth = FirebaseAuth.getInstance()
         emailResetEditText = findViewById(R.id.emailResetEditText)
         resetButton = findViewById(R.id.resetButton)
-        auth = FirebaseAuth.getInstance()
-
-        resetButton.setOnClickListener{
-            resetPWD();
-        }
+        resetButton.setOnClickListener{ resetPWD(); }
     }
 
     private fun resetPWD(){
@@ -41,12 +38,17 @@ class forgotPassword : AppCompatActivity() {
             return
         }
 
-        auth.sendPasswordResetEmail(email).addOnCompleteListener(OnCompleteListener { task ->
-            if(task.isSuccessful){
-                Toast.makeText(this, "abbiamo inviato alla tua email, il modo per poter ressettare la tua password", Toast.LENGTH_LONG).show()
-            }else{
+        auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(
+                    this,
+                    "abbiamo inviato alla tua email, il modo per poter ressettare la tua password",
+                    Toast.LENGTH_LONG
+                ).show()
+                finish() //torno al login
+            } else {
                 Toast.makeText(this, "riprova, qualcosa è andato storto", Toast.LENGTH_LONG).show()
             }
-        })
+        }
     }
 }

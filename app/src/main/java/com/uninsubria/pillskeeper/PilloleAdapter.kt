@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -39,6 +40,7 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
         }
         // imposta il testo
         holder.textView.text = elemento.name
+        //holder.cella.setOnClickListener {  }
     }
 
     // restituisce il numero di elementi della lista
@@ -50,5 +52,6 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
     class ElementiVista(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
+        //val cella: CardView = itemView.findViewById(R.id.cardView)
     }
 }

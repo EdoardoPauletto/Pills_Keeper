@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
         auth = Firebase.auth //inizializza col db
         addButton = findViewById(R.id.floatingActionButton)
         addButton.setOnClickListener { onAddClick() }
-        caricaFarmaci()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -101,7 +100,8 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LogInActivity::class.java) //vado al login
             startActivity(intent)
             finish()
-        }
+        } else
+            caricaFarmaci()
     }
     /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (id == R.id.action_settings){
