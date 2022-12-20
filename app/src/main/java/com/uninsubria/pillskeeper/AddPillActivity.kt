@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.AlarmClock
+import android.text.Editable
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -56,10 +57,10 @@ class AddPillActivity : AppCompatActivity() {
             openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(openClockIntent)
         }
-        val nomefarmaco = intent.getStringExtra("nomeFarmaco")
+        val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
         val imgFarmaco = intent.getStringExtra("imgFarmaco")
         if(nomeFarmaco != null && imgFarmaco != null){
-            mEditTextFileName.text = nomeFarmaco
+            mEditTextFileName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco) //da testare
             Picasso.get().load(imgFarmaco).into(mImageView)
         }
     }

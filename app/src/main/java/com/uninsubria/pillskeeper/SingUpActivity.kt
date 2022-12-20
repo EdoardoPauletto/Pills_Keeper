@@ -3,6 +3,7 @@ package com.uninsubria.pillskeeper
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -70,19 +71,19 @@ class SingUpActivity : AppCompatActivity() {
             emailEditText.error = "Inserisci cognome"
             return
         }
-        if (email.isEmpty()) {
-            emailEditText.error = "Inserisci email"
+        if (email.isEmpty() || (!Patterns.EMAIL_ADDRESS.matcher(email).matches())) {
+            emailEditText.error = "Inserisci email esistente"
             return
         }
-        if (password.isEmpty()) {
-            passwordEditText.error = "Inserisci password"
+        if (password.isEmpty() || password.length<6) {
+            passwordEditText.error = "Inserisci password da almeno 6 caratteri"
             return
         }
         if(cell.isEmpty()){
             cellulare.error = "Inserisci il tuo numero di cellulare"
             return
         }
-        if(emailM.isEmpty()){
+        if(emailM.isEmpty() || (!Patterns.EMAIL_ADDRESS.matcher(email).matches())){
             emailMedico.error = "Inserisci l'email del medico curante"
             return
         }

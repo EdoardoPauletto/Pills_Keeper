@@ -1,11 +1,13 @@
 package com.uninsubria.pillskeeper
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -41,10 +43,10 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
         // imposta il testo
         holder.textView.text = elemento.name
         holder.cella.setOnClickListener { 
-            val intent = Intent(this, AddPillActivity::class.java)
+            /*val intent = Intent(this@PilloleAdapter, AddPillActivity::class.java)
             intent.putExtra("nomeFarmaco", elemento.name) //passo dati all'activity
             intent.putExtra("imgFarmaco", elemento.mImageUrl)
-            startActivity(intent)
+            startActivity(intent)*/
          }
     }
 

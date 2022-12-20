@@ -1,6 +1,7 @@
 package com.uninsubria.pillskeeper
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.telephony.SmsManager
@@ -42,19 +43,29 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
             R.id.sms -> sendSMS()
-            //R.id.email -> sendEmail()
+            R.id.email -> sendEmail()
             R.id.logout -> onLogoutClick()
         }
         return super.onOptionsItemSelected(item)
     }
 
-    @Suppress("DEPRECATION")
     private fun sendSMS(){
         /*val obj : SmsManager = SmsManager.getDefault() //a me da errore
         obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)*/
-        /*val it =  Intent(Intent.ACTION_SENDTO.);
+        /*val it =  Intent(Intent.ACTION_SENDTO, 3467635500);
         it.putExtra("sms_body", "Here you can set the SMS text to be sent");
         startActivity(it);*/
+            val uri = Uri.parse("smsto:3776894189")
+            val intent = Intent(Intent.ACTION_SENDTO, uri)
+            intent.putExtra("sms_body", "Here goes your message...")
+            startActivity(intent)
+
+    }
+
+    private fun sendEmail(){
+        val intent = Intent(this, send_email::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun onLogoutClick(){
