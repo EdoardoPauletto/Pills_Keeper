@@ -47,10 +47,14 @@ class MainActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     @Suppress("DEPRECATION")
     private fun sendSMS(){
-        val obj : SmsManager = SmsManager.getDefault() //a me da errore
-        obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)
+        /*val obj : SmsManager = SmsManager.getDefault() //a me da errore
+        obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)*/
+        /*val it =  Intent(Intent.ACTION_SENDTO.);
+        it.putExtra("sms_body", "Here you can set the SMS text to be sent");
+        startActivity(it);*/
     }
 
     private fun onLogoutClick(){
@@ -66,15 +70,13 @@ class MainActivity : AppCompatActivity() {
         //SMS
        /* val smsManager: SmsManager = SmsManager.getDefault()
         smsManager.sendTextMessage("+39 " + myNumber, null, myMsg, null, null)
-        Toast.makeText(this, "Message Sent", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Message Sent", Toast.LENGTH_SHORT).show()*/
         //oppure
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null)));
+        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null)));
         //o
-        Intent it = new Intent(Intent.ACTION_SENDTO, uri); 
-        it.putExtra("sms_body", "Here you can set the SMS text to be sent"); 
-        startActivity(it);
+
         //mail
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+       /* Intent emailIntent = new Intent(Intent.ACTION_SEND);
       
         emailIntent.setData(Uri.parse("mailto:"));
         emailIntent.setType("text/plain");
