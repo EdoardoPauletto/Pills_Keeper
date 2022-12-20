@@ -56,6 +56,12 @@ class AddPillActivity : AppCompatActivity() {
             openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(openClockIntent)
         }
+        val nomefarmaco = intent.getStringExtra("nomeFarmaco")
+        val imgFarmaco = intent.getStringExtra("imgFarmaco")
+        if(nomeFarmaco != null && imgFarmaco != null){
+            mEditTextFileName.text = nomeFarmaco
+            Picasso.get().load(imgFarmaco).into(mImageView)
+        }
     }
     private fun openFileChooser() {
         val intent = Intent()
