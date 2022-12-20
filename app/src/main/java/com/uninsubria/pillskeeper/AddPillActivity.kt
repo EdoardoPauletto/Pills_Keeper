@@ -91,7 +91,7 @@ class AddPillActivity : AppCompatActivity() {
 
     //UPLOAD
     private fun uploadFile() {
-        if (!mImageUri.path.isNullOrBlank()) { //controllo che effettivamente abbia selezionato un'immagine (DA TESTARE)
+        if (mImageUri != Uri.parse("")) { //controllo che effettivamente abbia selezionato un'immagine (DA TESTARE)
             //mStorageRef punta alla cartella Storage
             val fileReference = mStorageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
