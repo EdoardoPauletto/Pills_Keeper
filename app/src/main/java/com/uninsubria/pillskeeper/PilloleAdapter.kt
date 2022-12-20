@@ -40,7 +40,12 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
         }
         // imposta il testo
         holder.textView.text = elemento.name
-        //holder.cella.setOnClickListener {  }
+        holder.cella.setOnClickListener { 
+            val intent = Intent(this, AddPillActivity::class.java)
+            intent.putExtra("nomeFarmaco", elemento.name) //passo dati all'activity
+            intent.putExtra("imgFarmaco", elemento.mImageUrl)
+            startActivity(intent)
+         }
     }
 
     // restituisce il numero di elementi della lista
@@ -52,6 +57,6 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
     class ElementiVista(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
-        //val cella: CardView = itemView.findViewById(R.id.cardView)
+        val cella: CardView = itemView.findViewById(R.id.cardView)
     }
 }
