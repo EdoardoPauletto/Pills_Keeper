@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.telephony.SmsManager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +25,7 @@ import com.google.firebase.storage.FirebaseStorage
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
     lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
+    val listaFarmaci = ArrayList<Upload>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -129,6 +129,7 @@ class MainActivity : AppCompatActivity() {
     }*/
 
     private fun caricaFarmaci(){
+        listaFarmaci.clear()
         val farmaciDB = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
         farmaciDB.child("farmaci/").addValueEventListener(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -146,16 +147,15 @@ class MainActivity : AppCompatActivity() {
                     recyclerview.layoutManager = LinearLayoutManager(MainActivity())
 
                     // lista degli elementi da inserire
-                    val data = ArrayList<Upload>()
                     for (f in snapshot.children){
                         val tmp = f.getValue(Upload::class.java)
                         //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
-                        data.add(tmp!!)
+                        listaFarmaci.add(tmp!!)
                     }
                     //data.add(Upload("Item ", "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656494538372.jpg?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
 
                     // This will pass the ArrayList to our Adapter
-                    val adapter = PilloleAdapter(data)
+                    val adapter = PilloleAdapter(listaFarmaci) { position -> onListItemClick(position) }
 
                     // Setting the Adapter with the recyclerview
                     recyclerview.adapter = adapter
@@ -166,5 +166,11 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TAG", error.message); //Don't ignore errors!
             }
         })
+    }
+    private fun onListItemClick(position: Int) {
+        //Toast.makeText(baseContext, "ciao " + listaFarmaci[position].name, Toast.LENGTH_SHORT).show()
+        val intent = Intent(this, AddPillActivity::class.java)
+        intent.putExtra("nomeFarmaco", listaFarmaci[position].name)
+        startActivity(intent)
     }
 }

@@ -59,9 +59,9 @@ class AddPillActivity : AppCompatActivity() {
         }
         val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
         val imgFarmaco = intent.getStringExtra("imgFarmaco")
-        if(nomeFarmaco != null && imgFarmaco != null){
+        if(nomeFarmaco != null ){ //&& imgFarmaco != null
             mEditTextFileName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco) //da testare
-            Picasso.get().load(imgFarmaco).into(mImageView)
+            //Picasso.get().load(imgFarmaco).into(mImageView)
         }
     }
     private fun openFileChooser() {

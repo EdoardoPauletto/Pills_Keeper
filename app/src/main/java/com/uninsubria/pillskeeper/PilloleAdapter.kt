@@ -1,21 +1,17 @@
 package com.uninsubria.pillskeeper
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
 
-class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
+class PilloleAdapter(private val lista: List<Upload>, private val onItemClicked: (position: Int) -> Unit): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
     // crea nuove views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElementiVista {
         // inflates the card_view_design view
@@ -23,7 +19,7 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_view_design, parent, false)
 
-        return ElementiVista(view)
+        return ElementiVista(view, onItemClicked)
     }
 
     // associa gli elementi dell'elenco a una vista
@@ -42,12 +38,6 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
         }
         // imposta il testo
         holder.textView.text = elemento.name
-        holder.cella.setOnClickListener { 
-            /*val intent = Intent(this@PilloleAdapter, AddPillActivity::class.java)
-            intent.putExtra("nomeFarmaco", elemento.name) //passo dati all'activity
-            intent.putExtra("imgFarmaco", elemento.mImageUrl)
-            startActivity(intent)*/
-         }
     }
 
     // restituisce il numero di elementi della lista
@@ -56,9 +46,14 @@ class PilloleAdapter(private val lista: List<Upload>): RecyclerView.Adapter<Pill
     }
 
     // Holds the views for adding it to image and text
-    class ElementiVista(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
+    class ElementiVista(ItemView: View, private val onItemClicked: (position: Int) -> Unit) : RecyclerView.ViewHolder(ItemView), View.OnClickListener {
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
-        val cella: CardView = itemView.findViewById(R.id.cardView)
+        init {
+            itemView.setOnClickListener(this)
+        }
+        override fun onClick(p0: View?) {
+            onItemClicked(adapterPosition)
+        }
     }
 }
