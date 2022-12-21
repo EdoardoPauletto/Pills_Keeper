@@ -1,18 +1,15 @@
 package com.uninsubria.pillskeeper
 
+import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.AlarmManager
 import android.app.PendingIntent.FLAG_MUTABLE
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import android.view.Menu
@@ -20,6 +17,7 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
@@ -35,7 +33,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
@@ -64,9 +61,18 @@ class MainActivity : AppCompatActivity() {
             R.id.email -> sendEmail()
             R.id.not -> Notification()
             R.id.logout -> onLogoutClick()
-            R.id.geo -> setAlarm()
+            //R.id.geo -> setAlarm()
+            R.id.geo -> openMaps()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun openMaps() {
+        // Search for restaurants nearby
+        val gmmIntentUri = Uri.parse("geo:0,0?q=farmacia")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        //mapIntent.setPackage("com.google.android.apps.maps") togliendo questo si può scelgiere quale navigatore utilizzare
+        startActivity(mapIntent)
     }
 
     private fun sendSMS(){
