@@ -1,9 +1,16 @@
 package com.uninsubria.pillskeeper
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.SystemClock
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +28,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
@@ -30,6 +39,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        title = "KotlinApp"
         auth = Firebase.auth //inizializza col db
         addButton = findViewById(R.id.floatingActionButton)
         addButton.setOnClickListener { onAddClick() }
@@ -45,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             R.id.sms -> sendSMS()
             R.id.email -> sendEmail()
             R.id.logout -> onLogoutClick()
+            R.id.geo -> setAlarm()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -152,7 +163,6 @@ class MainActivity : AppCompatActivity() {
                         //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
                         listaFarmaci.add(tmp!!)
                     }
-                    //data.add(Upload("Item ", "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o/1656494538372.jpg?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"))
 
                     // This will pass the ArrayList to our Adapter
                     val adapter = PilloleAdapter(listaFarmaci) { position -> onListItemClick(position) }
@@ -167,10 +177,40 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
     private fun onListItemClick(position: Int) {
         //Toast.makeText(baseContext, "ciao " + listaFarmaci[position].name, Toast.LENGTH_SHORT).show()
         val intent = Intent(this, AddPillActivity::class.java)
         intent.putExtra("nomeFarmaco", listaFarmaci[position].name)
         startActivity(intent)
+    }
+
+    private fun setAlarm(){
+        /*val calendar: Calendar = Calendar.getInstance()
+        calendar.set(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH),
+            17,
+            10,
+            0
+        )*/
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        if (Build.VERSION.SDK_INT >= 31){
+            if (!alarmManager.canScheduleExactAlarms()) { //da android 12 bisogna dare il permesso
+                val intent = Intent()
+                intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                startActivity(intent)
+            }
+            Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
+        }
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 5, intent, 0)
+        alarmManager.setExact(
+            AlarmManager.RTC,
+            SystemClock.elapsedRealtime() + 3000,
+            pendingIntent
+        )
+        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show()
     }
 }
