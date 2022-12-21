@@ -11,6 +11,9 @@
     <item android:id="@+id/geo"
         android:title="trova la farmacia più vivina"
         app:showAsAction="never"/>
+    <item android:id="@+id/not"
+        android:title="prova notifica"
+        app:showAsAction="never"/>
     <item android:id="@+id/logout"
         android:title="Esci"
         app:showAsAction="never"/>

@@ -7,30 +7,37 @@ import android.widget.Button
 import android.widget.EditText
 
 class send_email : AppCompatActivity() {
-    lateinit var Subject : EditText
-    lateinit var Text : EditText
-    lateinit var Send : Button
-    lateinit var sub : String
-    lateinit var Tex : String
+    private lateinit var button: Button
+
+    //private lateinit var sendto: EditText
+    private lateinit var subject: EditText
+    private lateinit var body: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_send_email)
-        Subject = findViewById(R.id.textViewOgg)
-        Text = findViewById(R.id.testoEdit)
-        Send = findViewById(R.id.sendButtonE)
-        Send.setOnClickListener {
-            getData()
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.putExtra(Intent.EXTRA_SUBJECT, sub)
-            intent.putExtra(Intent.EXTRA_TEXT, Tex)
-            intent.type = "message/rfc822"
-            startActivity(Intent.createChooser(intent,"select"))
-        }
-    }
 
-    private fun getData(){
-        sub = Subject.text.toString()
-        Tex = Text.text.toString()
+        // Getting instance of edittext and button
+        //sendto = findViewById(R.id.editText1)
+        subject = findViewById(R.id.objEditText)
+        body = findViewById(R.id.testoEdit)
+        button = findViewById(R.id.sendButtonE)
+
+        // attach setOnClickListener to button with Intent object define in it
+        button.setOnClickListener {
+            val emailsend = "giangifumagalli1@gmail.com"
+            val emailsubject = subject.getText().toString()
+            val emailbody = body.getText().toString()
+            // define Intent object with action attribute as ACTION_SEND
+            val intent = Intent(Intent.ACTION_SEND)
+            // add three fields to intent using putExtra function
+            intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(emailsend))
+            intent.putExtra(Intent.EXTRA_SUBJECT, emailsubject)
+            intent.putExtra(Intent.EXTRA_TEXT, emailbody)
+            // set type of intent
+            intent.type = "message/rfc822"
+            // startActivity with intent with chooser as Email client using createChooser function
+            startActivity(Intent.createChooser(intent, "Choose an Email client :"))
+        }
     }
 }
