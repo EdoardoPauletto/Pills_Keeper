@@ -1,7 +1,9 @@
 package com.uninsubria.pillskeeper
 
-import android.app.AlarmManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.AlarmManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -17,6 +19,8 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,11 +40,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
     lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
     val listaFarmaci = ArrayList<Upload>()
+    private companion object{
+        private const val CHANNEL_ID = "canale01"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        title = "KotlinApp"
         auth = Firebase.auth //inizializza col db
         addButton = findViewById(R.id.floatingActionButton)
         addButton.setOnClickListener { onAddClick() }
@@ -54,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId){
             R.id.sms -> sendSMS()
             R.id.email -> sendEmail()
+            R.id.not -> Notification()
             R.id.logout -> onLogoutClick()
             R.id.geo -> setAlarm()
         }
@@ -83,6 +91,42 @@ class MainActivity : AppCompatActivity() {
         //auth.signOut() ne basta uno dei due, da capire perchè
         Firebase.auth.signOut()
         onStart()
+    }
+
+    private fun Notification(){
+        createNotificationChannel()
+
+        val date = Date()
+        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(date).toInt()
+
+        val intent = Intent(this, AddPillActivity::class.java)
+        intent.putExtra("key", "35")
+        //startActivity(intent)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val mainPendingInetnt = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val notificationBuilder = NotificationCompat.Builder(this, "$CHANNEL_ID")
+        notificationBuilder.setSmallIcon(R.drawable.pill_icon_main)
+        notificationBuilder.setContentTitle("Aspetta Aspetta ASPETTA")
+        notificationBuilder.setContentText("non hai nessuna medicina aggiunta o almeno segnalata")
+        notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+        notificationBuilder.setAutoCancel(true)
+        notificationBuilder.setContentIntent(mainPendingInetnt)
+        val notifictionmanagerCompat = NotificationManagerCompat.from(this)
+        notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
+    }
+
+    private fun createNotificationChannel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val name: CharSequence = "mynotifica"
+            val desc = "my description"
+
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val notificationChannel = NotificationChannel(CHANNEL_ID, name, importance)
+            notificationChannel.description = desc
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 
     private fun onAddClick() { //quando pulsante cliccato
