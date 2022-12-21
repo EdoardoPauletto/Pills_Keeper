@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.AlarmManager
+import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         val mainPendingInetnt = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        val notificationBuilder = NotificationCompat.Builder(this, "$CHANNEL_ID")
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.drawable.pill_icon_main)
         notificationBuilder.setContentTitle("Aspetta Aspetta ASPETTA")
         notificationBuilder.setContentText("non hai nessuna medicina aggiunta o almeno segnalata")
@@ -249,12 +250,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
         }
         val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 5, intent, 0)
-        alarmManager.setExact(
+        val pendingIntent = PendingIntent.getBroadcast(this, 5, intent, FLAG_MUTABLE)
+        alarmManager.set(
             AlarmManager.RTC,
-            SystemClock.elapsedRealtime() + 3000,
+            3000,
             pendingIntent
         )
-        Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show()
     }
 }
