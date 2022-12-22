@@ -22,8 +22,8 @@
             android:name=".send_email"
             android:exported="false">
             <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.uninsubria.pillskeeper.MainActivity" />
         </activity>
         <activity
             android:name=".forgotPassword"

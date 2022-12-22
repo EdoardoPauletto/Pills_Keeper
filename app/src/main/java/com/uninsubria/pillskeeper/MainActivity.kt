@@ -89,9 +89,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendEmail(){
-        val intent = Intent(this, send_email::class.java)
-        startActivity(intent)
-        finish()
+        val testIntent = Intent(Intent.ACTION_VIEW)
+        val data: Uri = Uri.parse("mailto:?subject=" + "blah blah subject" + "&body=" + "blah blah body" + "&to=" + "giangifumagalli1@gmail.com")
+        testIntent.data = data
+        startActivity(testIntent)
     }
 
     private fun onLogoutClick(){
