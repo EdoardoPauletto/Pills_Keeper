@@ -1,11 +1,13 @@
 package com.uninsubria.pillskeeper
 
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.provider.AlarmClock
 import android.text.Editable
+import android.text.format.DateFormat
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -17,9 +19,10 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
+import java.util.*
 
 
-class AddPillActivity : AppCompatActivity() {
+class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  {
     private val PICK_IMAGE_REQUEST: Int = 1
     private lateinit var auth: FirebaseAuth
     private lateinit var mButtonChooseImage: Button
@@ -27,6 +30,8 @@ class AddPillActivity : AppCompatActivity() {
     private lateinit var mTextViewShowUplaods: TextView
     private lateinit var mEditTextFileName: EditText
     private lateinit var mImageView: ImageView
+    private lateinit var editTextTime: EditText
+    private lateinit var buttonTimePicker: Button
     private lateinit var mProgressBar: ProgressBar
     private lateinit var mImageUri: Uri //tipo url ma per i file
     //UPLOAD
@@ -45,6 +50,8 @@ class AddPillActivity : AppCompatActivity() {
         mTextViewShowUplaods = findViewById(R.id.mostraCaricaTextView)
         mEditTextFileName = findViewById(R.id.nomeFarmacoEditText)
         mImageView = findViewById(R.id.immagine)
+        editTextTime = findViewById(R.id.editTextTime)
+        buttonTimePicker = findViewById(R.id.buttonTimePicker)
         mProgressBar = findViewById(R.id.progressBar)
         //UPLOAD, con la string "uploads" andremo in quella cartella senò andiamo al top node
         mStorageRef = FirebaseStorage.getInstance().reference
@@ -57,6 +64,7 @@ class AddPillActivity : AppCompatActivity() {
             openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(openClockIntent)
         }
+        buttonTimePicker.setOnClickListener { openTimePicker() }
         val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
         val imgFarmaco = intent.getStringExtra("imgFarmaco")
         if(nomeFarmaco != null && imgFarmaco != null){
@@ -69,6 +77,20 @@ class AddPillActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun openTimePicker() {//faccio selezionare un orario
+        val calendario: Calendar = Calendar.getInstance()
+        val ore = calendario.get(Calendar.HOUR)
+        val minuti = calendario.get(Calendar.MINUTE)
+        val timePickerDialog = TimePickerDialog(this, this, ore, minuti,
+            DateFormat.is24HourFormat(this))
+        timePickerDialog.show()
+    }
+
+    override fun onTimeSet(p0: TimePicker?, h: Int, m: Int) {//quando sel un orario
+        editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
+    }
+
     private fun openFileChooser() {
         val intent = Intent()
         intent.type = "image/*" //vede solo immagini
@@ -83,6 +105,7 @@ class AddPillActivity : AppCompatActivity() {
         //resultcode == RESULT_OK se prende l'immagine va alla next line
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) { //se l'utente sceglie un' immagine controlla che non sia nulla
             mImageUri = data.data!! ////return del uri dell'immagine scelta (forziamo non null)
+            Toast.makeText(this, "File selezionato", Toast.LENGTH_SHORT).show()
             Picasso.get().load(mImageUri).into(mImageView)
         }
     }
@@ -96,7 +119,7 @@ class AddPillActivity : AppCompatActivity() {
 
     //UPLOAD
     private fun uploadFile() {
-        if (mImageUri != Uri.parse("")) { //controllo che effettivamente abbia selezionato un'immagine (DA TESTARE)
+        if (this::mImageUri.isInitialized) { //controllo che sia stato dato un valore (essendo lateinit è sempre != null)
             //mStorageRef punta alla cartella Storage
             val fileReference = mStorageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
             //il nome è formato da tempo in ms ed estensione per evitare omonimi
@@ -132,4 +155,6 @@ class AddPillActivity : AppCompatActivity() {
             Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 }

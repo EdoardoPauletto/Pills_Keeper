@@ -12,6 +12,7 @@
         android:id="@+id/immagine"
         android:layout_width="154dp"
         android:layout_height="158dp"
+        android:contentDescription="immagine del farmaco"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/images" />
@@ -38,27 +39,163 @@
         app:layout_constraintTop_toBottomOf="@+id/immagine" />
 
     <EditText
-        android:id="@+id/editTextNumber"
-        android:layout_width="wrap_content"
+        android:id="@+id/quantitaTotEditText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="9"
-        android:hint="Quantità da assumere"
+        android:layout_marginTop="8dp"
+        android:hint="Quantità nella confezione"
         android:inputType="number"
         android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
 
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
+        app:layout_constraintTop_toBottomOf="@+id/quantitaTotEditText"
+        tools:layout_editor_absoluteX="16dp">
+
+        <EditText
+            android:id="@+id/quantitaEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:hint="Quantità da assumere"
+            android:inputType="number"
+            android:minHeight="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/orari_allarmi"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/editTextNumber"
+            app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
+    </LinearLayout>
+
     <EditText
-        android:id="@+id/editTextNumber2"
+        android:id="@+id/editTextTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="9"
-        android:hint="Qnt tot confezione"
-        android:inputType="number"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Orario inizio"
+        android:inputType="time"
         android:minHeight="48dp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linear1" />
+
+    <Button
+        android:id="@+id/buttonTimePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Scegli orario"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/editTextTime"
+        app:layout_constraintTop_toBottomOf="@+id/linear1" />
+
+    <TextView
+        android:id="@+id/textViewGiorni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:text="Quali giorni: da lunedì a venerdì"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@+id/editTextTime"
+        app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        app:layout_constraintTop_toBottomOf="@+id/textViewGiorni"
+        tools:layout_editor_absoluteX="16dp">
+
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="ToggleButton"
+            android:textOff="L"
+            android:textOn="L" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton2"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="ToggleButton"
+            android:textOff="M"
+            android:textOn="M" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton3"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="ToggleButton"
+            android:textOff="M"
+            android:textOn="M" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton4"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="ToggleButton"
+            android:textOff="G"
+            android:textOn="G" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton5"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="ToggleButton"
+            android:textOff="V"
+            android:textOn="V" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton6"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ToggleButton"
+            android:textOff="S"
+            android:textOn="S" />
+
+        <ToggleButton
+            android:id="@+id/toggleButton7"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ToggleButton"
+            android:textOff="D"
+            android:textOn="D" />
+
+
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -83,19 +220,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Mostra Caricamenti"
-        android:textSize="18dp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progressBar" />
-
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="154dp"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editTextNumber"
-        app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

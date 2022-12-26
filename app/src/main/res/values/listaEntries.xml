@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="orari_allarmi">
+        <item>Ogni 30 min</item>
+        <item>Ogni 1 ora</item>
+        <item>Ogni 2 ore</item>
+        <item>Ogni 6 ore</item>
+        <item>Ogni 12 ore</item>
+        <item>Ogni 24 ore </item>
+        <item>A giorni alterni</item>
+    </array>
+</resources>
