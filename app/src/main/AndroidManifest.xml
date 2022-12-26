@@ -26,7 +26,7 @@
                 android:value="com.uninsubria.pillskeeper.MainActivity" />
         </activity>
         <activity
-            android:name=".forgotPassword"
+            android:name=".ForgotPassword"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

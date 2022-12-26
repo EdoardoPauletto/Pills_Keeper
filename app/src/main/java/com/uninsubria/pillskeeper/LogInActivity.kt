@@ -89,7 +89,7 @@ class LogInActivity : AppCompatActivity() {
         }
     }*/
     private fun onForgotClick(){
-        val intent = Intent(this, forgotPassword::class.java)
+        val intent = Intent(this, ForgotPassword::class.java)
         startActivity(intent)
     }
 }

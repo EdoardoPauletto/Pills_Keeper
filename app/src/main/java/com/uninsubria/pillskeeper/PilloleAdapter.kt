@@ -29,7 +29,7 @@ class PilloleAdapter(private val lista: List<Upload>, private val onItemClicked:
 
         // imposta l'immagine
         //Picasso.get().load(elemento.mImageUrl).into(holder.imageView)
-        val s = FirebaseStorage.getInstance().getReferenceFromUrl("gs://prove-b822e.appspot.com" + elemento.mImageUrl)
+        val s = elemento.convertImg()
         s.downloadUrl.addOnSuccessListener { uri ->
             // Pass it to Picasso to download, show in ImageView and caching
             Picasso.get().load(uri.toString()).into(holder.imageView)

@@ -59,9 +59,14 @@ class AddPillActivity : AppCompatActivity() {
         }
         val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
         val imgFarmaco = intent.getStringExtra("imgFarmaco")
-        if(nomeFarmaco != null ){ //&& imgFarmaco != null
+        if(nomeFarmaco != null && imgFarmaco != null){
             mEditTextFileName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco) //da testare
-            //Picasso.get().load(imgFarmaco).into(mImageView)
+            Upload().convertImg(imgFarmaco).downloadUrl.addOnSuccessListener { uri ->
+                // Pass it to Picasso to download, show in ImageView and caching
+                Picasso.get().load(uri.toString()).into(mImageView)
+            }.addOnFailureListener {
+                // Handle any errors
+            }
         }
     }
     private fun openFileChooser() {

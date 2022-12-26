@@ -6,10 +6,9 @@ import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 
-class forgotPassword : AppCompatActivity() {
+class ForgotPassword : AppCompatActivity() {
 
     lateinit var emailResetEditText: EditText
     lateinit var resetButton: Button

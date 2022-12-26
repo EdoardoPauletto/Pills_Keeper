@@ -234,6 +234,7 @@ class MainActivity : AppCompatActivity() {
         //Toast.makeText(baseContext, "ciao " + listaFarmaci[position].name, Toast.LENGTH_SHORT).show()
         val intent = Intent(this, AddPillActivity::class.java)
         intent.putExtra("nomeFarmaco", listaFarmaci[position].name)
+        intent.putExtra("imgFarmaco", listaFarmaci[position].mImageUrl)
         startActivity(intent)
     }
 
