@@ -257,6 +257,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
         }
         val intent = Intent(this, AlarmReceiver::class.java)
+        intent.putExtra("tel", 331)
+        //mail medico
         val pendingIntent = PendingIntent.getBroadcast(this, 5, intent, FLAG_MUTABLE)
         alarmManager.set(
             AlarmManager.RTC,

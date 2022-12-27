@@ -27,7 +27,8 @@
         android:text="Pills Keeper"
         android:textColor="#FFFFFF"
         android:textSize="44sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="TextContrastCheck" />
 
     <EditText
         android:id="@+id/emailEditText"
