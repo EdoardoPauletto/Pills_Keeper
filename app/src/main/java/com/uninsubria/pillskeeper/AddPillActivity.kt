@@ -25,18 +25,23 @@ import java.util.*
 class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  {
     private val PICK_IMAGE_REQUEST: Int = 1
     private lateinit var auth: FirebaseAuth
-    private lateinit var mButtonChooseImage: Button
-    private lateinit var mButtonUpload: Button
-    private lateinit var mTextViewShowUplaods: TextView
-    private lateinit var mEditTextFileName: EditText
-    private lateinit var mImageView: ImageView
+    private lateinit var imageView: ImageView
+    private lateinit var buttonChooseImage: Button
+    private lateinit var editTextPillName: EditText
+    private lateinit var editTextQntTot: EditText
+    private lateinit var editTextQnt: EditText
+    private lateinit var spinnerWhen: Spinner
     private lateinit var editTextTime: EditText
     private lateinit var buttonTimePicker: Button
-    private lateinit var mProgressBar: ProgressBar
-    private lateinit var mImageUri: Uri //tipo url ma per i file
+    //private lateinit var textViewDay: TextView prossimamente
+    private lateinit var progressBar: ProgressBar
+    private lateinit var buttonUpload: Button
+    private lateinit var textViewShowUplaods: TextView
+    private lateinit var imageUri: Uri //tipo url ma per i file
     //UPLOAD
-    private lateinit var mStorageRef: StorageReference
-    private lateinit var mDatabaseRef: DatabaseReference
+    private lateinit var storageRef: StorageReference
+    private lateinit var databaseRef: DatabaseReference
+    private var mod: Boolean = false//se modifica o carica
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,36 +50,42 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         supportActionBar?.setDisplayHomeAsUpEnabled(true) //mostra il back in alto
 
         auth = Firebase.auth
-        mButtonChooseImage = findViewById(R.id.selectFileButton) //gli assegno il reale elemento
-        mButtonUpload = findViewById(R.id.caricaButton)
-        mTextViewShowUplaods = findViewById(R.id.mostraCaricaTextView)
-        mEditTextFileName = findViewById(R.id.nomeFarmacoEditText)
-        mImageView = findViewById(R.id.immagine)
+        imageView = findViewById(R.id.immagine)
+        buttonChooseImage = findViewById(R.id.selectFileButton) //gli assegno il reale elemento
+        editTextPillName = findViewById(R.id.nomeFarmacoEditText)
+        editTextQntTot = findViewById(R.id.quantitaTotaleEditText)
+        editTextQnt = findViewById(R.id.quantitaEditText)
+        spinnerWhen = findViewById(R.id.ogniQuantoSpinner)
         editTextTime = findViewById(R.id.editTextTime)
         buttonTimePicker = findViewById(R.id.buttonTimePicker)
-        mProgressBar = findViewById(R.id.progressBar)
+        progressBar = findViewById(R.id.progressBar)
+        buttonUpload = findViewById(R.id.caricaButton)
+        textViewShowUplaods = findViewById(R.id.mostraCaricaTextView)
         //UPLOAD, con la string "uploads" andremo in quella cartella senò andiamo al top node
-        mStorageRef = FirebaseStorage.getInstance().reference
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
+        storageRef = FirebaseStorage.getInstance().reference
+        databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid + "/farmaci/")
 
-        mButtonChooseImage.setOnClickListener { openFileChooser() } //creare metodo
-        mButtonUpload.setOnClickListener { uploadFile() } //semplificato
-        mTextViewShowUplaods.setOnClickListener{
+        buttonChooseImage.setOnClickListener { openFileChooser() } //creare metodo
+        buttonTimePicker.setOnClickListener { openTimePicker() }
+        buttonUpload.setOnClickListener { uploadFile() }
+        textViewShowUplaods.setOnClickListener{
             val openClockIntent = Intent(AlarmClock.ACTION_SET_ALARM) //apre direttamente l'orologio, funziona
             openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(openClockIntent)
         }
-        buttonTimePicker.setOnClickListener { openTimePicker() }
-        val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
-        val imgFarmaco = intent.getStringExtra("imgFarmaco")
-        if(nomeFarmaco != null && imgFarmaco != null){
-            mEditTextFileName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco) //da testare
-            Upload().convertImg(imgFarmaco).downloadUrl.addOnSuccessListener { uri ->
+        //quando modifica uno già esistente
+        if(intent.hasExtra("nomeFarmaco") && intent.extras!!.size() == 2){
+            val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
+            val imgFarmaco = intent.getStringExtra("imgFarmaco")
+            editTextPillName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco)
+            Farmaco().convertImg(imgFarmaco!!).downloadUrl.addOnSuccessListener { uri ->
                 // Pass it to Picasso to download, show in ImageView and caching
-                Picasso.get().load(uri.toString()).into(mImageView)
+                Picasso.get().load(uri.toString()).into(imageView)
             }.addOnFailureListener {
                 // Handle any errors
             }
+            mod = true
+            buttonUpload.text = "Modifica"
         }
     }
 
@@ -82,13 +93,13 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         val calendario: Calendar = Calendar.getInstance()
         val ore = calendario.get(Calendar.HOUR)
         val minuti = calendario.get(Calendar.MINUTE)
-        val timePickerDialog = TimePickerDialog(this, this, ore, minuti,
-            DateFormat.is24HourFormat(this))
+        val timePickerDialog = TimePickerDialog(this, this, ore, minuti, DateFormat.is24HourFormat(this))
         timePickerDialog.show()
     }
 
     override fun onTimeSet(p0: TimePicker?, h: Int, m: Int) {//quando sel un orario
         editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
+        editTextTime.error = null //tolgo eventuale errore segnalato perchè vuoto
     }
 
     private fun openFileChooser() {
@@ -104,9 +115,9 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         //requestcode == richiesta che vogliamo che faccia
         //resultcode == RESULT_OK se prende l'immagine va alla next line
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.data != null) { //se l'utente sceglie un' immagine controlla che non sia nulla
-            mImageUri = data.data!! ////return del uri dell'immagine scelta (forziamo non null)
+            imageUri = data.data!! //return del uri dell'immagine scelta (forziamo non null)
             Toast.makeText(this, "File selezionato", Toast.LENGTH_SHORT).show()
-            Picasso.get().load(mImageUri).into(mImageView)
+            Picasso.get().load(imageUri).into(imageView)
         }
     }
 
@@ -119,42 +130,51 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
 
     //UPLOAD
     private fun uploadFile() {
-        if (this::mImageUri.isInitialized) { //controllo che sia stato dato un valore (essendo lateinit è sempre != null)
-            //mStorageRef punta alla cartella Storage
-            val fileReference = mStorageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(mImageUri)) //mStorageRef.child("uploads/" + System.currentTime QUANDO SENZA REFERENCE nella variabile privata
-            //il nome è formato da tempo in ms ed estensione per evitare omonimi
+        val pillName = editTextPillName.text.toString().trim()
+        val qntTot = editTextQntTot.text.toString().trim()
+        val qnt = editTextQnt.text.toString().trim()
+        val hourspinner = spinnerWhen.selectedItem.toString()
+        val time = editTextTime.text.toString().trim()
+        if (pillName.isEmpty()) editTextPillName.error = "Inserire il nome del farmaco"
+        else if (qntTot.isEmpty()) editTextQntTot.error = "Inserire la quantità della confezione"
+        else if (qnt.isEmpty()) editTextQnt.error = "Inserire quantità da assumere"
+        else if (qntTot.toInt() < qnt.toInt()) editTextQnt.error = "Non possono essere meno di quelle in confezione"
+        else if (time.isEmpty()) editTextTime.error = "Scegliere un orario"
+        else if (!mod) {
+             if (this::imageUri.isInitialized) { //controllo che sia stato dato un valore (essendo lateinit è sempre != null)
+                //mStorageRef punta alla cartella Storage
+                val fileReference = storageRef.child(System.currentTimeMillis().toString() + "." + getFileExtension(imageUri))
+                //il nome è formato da tempo in ms ed estensione per evitare omonimi
+                fileReference.putFile(imageUri) //upload del file , continua sotto
+                    .addOnProgressListener { tasksnapshot ->//quando upload sta avvenendo, voglio aggiornare la progress bar con la percentuale corrente
+                        val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount //estrarre il progresso da tasksnapshot
+                        progressBar.progress = progress.toInt() //aggiorno la progress bar
+                    }
+                    .addOnSuccessListener { taskSnapshot ->//quando upload finisce
+                        Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
 
-            fileReference.putFile(mImageUri) //upload del file , continua sotto
-                .addOnSuccessListener { taskSnapshot ->
-                    //quando upload finisce, resetto la progressbar faccio delay di 5 millisec
-                    val handler = Handler()
-                    handler.postDelayed({ mProgressBar.progress = 0 }, 500)
-                    Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
+                        //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toInt(), qnt.toInt(), hourspinner, time)
+                        //crea nuova entrata nel db con unico id
+                        val uploadId = databaseRef.push().key
+                        //prendo id e gli setto i dati dell'upload file che contiene nome, immagine, ecc...
+                        databaseRef.child(uploadId!!).setValue(upload)
 
-                    //chiamo costruttore e prendo l'edit text col nome del farmaco e IL percorso DELL'IMMAGINE (diverso per ogni utente)
-                    val upload = Upload(mEditTextFileName.text.toString().trim { it <= ' ' }, taskSnapshot.storage.path)
-                    //per avere anche i meta data (URL,name)
-                    //crea nuova entrata nel db con unico id
-                    val uploadId = mDatabaseRef.push().key
-                    //prendo id e gli setto i dati dell'upload file che contiene nome e immagine
-                    mDatabaseRef.child("farmaci/" + uploadId!!).setValue(upload)
+                    }
+                    .addOnFailureListener { e -> //azioni quando upload non avviene
+                        Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                    }
+                    .addOnCompleteListener{ //quando finisce, aspetto un attimo e poi torno al main
+                        Thread.sleep(2000)
+                        finish() //chiude questa e torna a quella prima
+                    }
+            } else {
+                Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
+            }
+        }
+        else {
+            //modifico i valori
 
-                } //non finisce, c'è il punto
-                .addOnFailureListener { e -> //azioni quando upload non avviene
-                    Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-                } //non finisce, c'è il punto
-                .addOnProgressListener { tasksnapshot -> //quando upload sta avvenendo, voglio aggiornare la progress bar con la percentuale corrente
-                    val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount //estrarre il progresso da tasksnapshot
-                    mProgressBar.progress = progress.toInt() //aggiorno la progress bar
-                }
-                .addOnCompleteListener{ //quando finisce, aspetto un attimo e poi torno al main
-                    Thread.sleep(2000)
-                    finish() //chiude questa e torna a quella prima
-                }
-        } else {
-            Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 }

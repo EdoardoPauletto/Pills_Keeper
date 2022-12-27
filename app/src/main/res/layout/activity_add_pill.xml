@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@+id/immagine" />
 
     <EditText
-        android:id="@+id/quantitaTotEditText"
+        android:id="@+id/quantitaTotaleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -57,7 +57,7 @@
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
         android:weightSum="3"
-        app:layout_constraintTop_toBottomOf="@+id/quantitaTotEditText"
+        app:layout_constraintTop_toBottomOf="@+id/quantitaTotaleEditText"
         tools:layout_editor_absoluteX="16dp">
 
         <EditText
@@ -72,7 +72,7 @@
             app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
 
         <Spinner
-            android:id="@+id/spinner"
+            android:id="@+id/ogniQuantoSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -127,7 +127,7 @@
         tools:layout_editor_absoluteX="16dp">
 
         <ToggleButton
-            android:id="@+id/toggleButton"
+            android:id="@+id/lunToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -137,7 +137,7 @@
             android:textOn="L" />
 
         <ToggleButton
-            android:id="@+id/toggleButton2"
+            android:id="@+id/marToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -147,7 +147,7 @@
             android:textOn="M" />
 
         <ToggleButton
-            android:id="@+id/toggleButton3"
+            android:id="@+id/merToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -157,7 +157,7 @@
             android:textOn="M" />
 
         <ToggleButton
-            android:id="@+id/toggleButton4"
+            android:id="@+id/gioToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -167,7 +167,7 @@
             android:textOn="G" />
 
         <ToggleButton
-            android:id="@+id/toggleButton5"
+            android:id="@+id/venToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -177,7 +177,7 @@
             android:textOn="V" />
 
         <ToggleButton
-            android:id="@+id/toggleButton6"
+            android:id="@+id/sabToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -186,7 +186,7 @@
             android:textOn="S" />
 
         <ToggleButton
-            android:id="@+id/toggleButton7"
+            android:id="@+id/domToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -223,6 +223,7 @@
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/selectFileButton"
         app:layout_constraintTop_toBottomOf="@+id/progressBar" />
 
 

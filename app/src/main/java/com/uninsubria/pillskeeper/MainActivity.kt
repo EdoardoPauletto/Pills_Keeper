@@ -37,7 +37,7 @@ import java.util.*
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
     lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
-    val listaFarmaci = ArrayList<Upload>()
+    val listaFarmaci = ArrayList<Farmaco>()
     private companion object{
         private const val CHANNEL_ID = "canale01"
     }
@@ -199,10 +199,9 @@ class MainActivity : AppCompatActivity() {
                 if(!snapshot.exists()) {
                     Toast.makeText(baseContext, "Non c'è cartella farmaci", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(baseContext, "C'è tutto!!!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
                     findViewById<ImageView>(R.id.imageView2).isVisible = false //disattivo testo e immagine
                     findViewById<TextView>(R.id.textView).isVisible = false
-                    val mStorageRef = FirebaseStorage.getInstance().reference
                     // prendo la recycleView
                     val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
 
@@ -211,7 +210,7 @@ class MainActivity : AppCompatActivity() {
 
                     // lista degli elementi da inserire
                     for (f in snapshot.children){
-                        val tmp = f.getValue(Upload::class.java)
+                        val tmp = f.getValue(Farmaco::class.java)
                         //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
                         listaFarmaci.add(tmp!!)
                     }

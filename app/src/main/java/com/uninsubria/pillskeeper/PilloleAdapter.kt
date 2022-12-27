@@ -5,13 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 
 
-class PilloleAdapter(private val lista: List<Upload>, private val onItemClicked: (position: Int) -> Unit): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
+class PilloleAdapter(private val lista: List<Farmaco>, private val onItemClicked: (position: Int) -> Unit): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
     // crea nuove views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElementiVista {
         // inflates the card_view_design view
@@ -38,6 +36,7 @@ class PilloleAdapter(private val lista: List<Upload>, private val onItemClicked:
         }
         // imposta il testo
         holder.textView.text = elemento.name
+        holder.textView2.text = "${elemento.q}  - ${elemento.time}"
     }
 
     // restituisce il numero di elementi della lista
@@ -49,6 +48,7 @@ class PilloleAdapter(private val lista: List<Upload>, private val onItemClicked:
     class ElementiVista(ItemView: View, private val onItemClicked: (position: Int) -> Unit) : RecyclerView.ViewHolder(ItemView), View.OnClickListener {
         val imageView: ImageView = itemView.findViewById(R.id.imageview)
         val textView: TextView = itemView.findViewById(R.id.textView)
+        val textView2: TextView = itemView.findViewById(R.id.textView2)
         init {
             itemView.setOnClickListener(this)
         }
