@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/purple_200"
     android:orientation="vertical"
     android:padding="16dp">
@@ -11,10 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="130dp"
-        android:text="Dati prima persona fidata:"
+        android:text="@string/dati_prima_persona_fidata"
         android:layout_gravity="center"
         android:textColor="#FFFFFF"
-        android:textSize="20dp" />
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/NomePersonaFidata"
@@ -23,10 +22,11 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="Nome"
+        android:hint="@string/nome"
         android:inputType="textCapWords"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/CognomePersonaFidata"
@@ -34,10 +34,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ems="10"
-        android:hint="Cognome"
+        android:hint="@string/cognome"
         android:inputType="textCapWords"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/telefonoPersonaFidata"
@@ -47,17 +48,11 @@
         android:layout_marginBottom="16dp"
         android:ems="10"
         android:maxLength="10"
-        android:hint="numero di telefono"
+        android:hint="@string/numero_di_telefono_cellulare"
         android:inputType="phone"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
-
-    <!--<com.google.android.material.bottomnavigation.BottomNavigationView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>-->
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <LinearLayout
         android:id="@+id/footer"
@@ -66,7 +61,6 @@
         android:gravity="bottom"
         android:orientation="horizontal"
         android:backgroundTint="@color/purple_200"
-        android:layout_alignParentBottom="true"
         style="@android:style/ButtonBar">
 
         <Button
@@ -74,21 +68,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Indietro" />
+            android:text="@string/indietro"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/AddPersonButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Aggiungi un'altro" />
+            android:text="@string/aggiungi_un_altro"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/NextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Avanti" />
+            android:text="@string/avantiP"
+            tools:ignore="ButtonStyle" />
 
     </LinearLayout>
 </LinearLayout>

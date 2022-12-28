@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="130dp"
-        android:text="Dati persona fidata:"
+        android:text="@string/dati_persona_fidata"
         android:textColor="#FFFFFF"
-        android:textSize="20dp" />
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/NomePersonaFidata"
@@ -23,10 +23,11 @@
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
         android:ems="10"
-        android:hint="Nome"
+        android:hint="@string/nome"
         android:inputType="textCapWords"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/CognomePersonaFidata"
@@ -34,10 +35,11 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:ems="10"
-        android:hint="Cognome"
+        android:hint="@string/cognome"
         android:inputType="textCapWords"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/telefonoPersonaFidata"
@@ -47,10 +49,11 @@
         android:layout_marginBottom="16dp"
         android:ems="10"
         android:maxLength="10"
-        android:hint="Numero di telefono"
+        android:hint="@string/numero_di_telefono_cellulare"
         android:inputType="phone"
         android:minHeight="48dp"
-        android:textColorHint="@color/white" />
+        android:textColorHint="@color/white"
+        android:autofillHints="" />
 
     <LinearLayout
         android:id="@+id/footer"
@@ -66,21 +69,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="← elimina" />
+            android:text="@string/elimina"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/middleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Aggiungi un'altro" />
+            android:text="@string/aggiungi_un_altro"
+            tools:ignore="ButtonStyle" />
 
         <Button
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="→ Avanti" />
+            android:text="@string/avantiP"
+            tools:ignore="ButtonStyle" />
 
     </LinearLayout>
 

@@ -10,8 +10,8 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nessuna pillola aggiunta!!"
-        android:textSize="20dp"
+        android:text="@string/nessuna_pillola_aggiunta"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,7 +26,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="30dp"
         app:srcCompat="@drawable/add_24"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        android:contentDescription="@string/todo"
+        android:focusable="true" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -36,7 +38,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/images" />
+        app:srcCompat="@drawable/images"
+        android:contentDescription="@string/todo" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycleView"

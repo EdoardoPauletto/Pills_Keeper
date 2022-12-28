@@ -12,7 +12,7 @@
         android:id="@+id/immagine"
         android:layout_width="154dp"
         android:layout_height="158dp"
-        android:contentDescription="immagine del farmaco"
+        android:contentDescription="@string/immagine_del_farmaco"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/images" />
@@ -21,7 +21,7 @@
         android:id="@+id/selectFileButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scegli immagine"
+        android:text="@string/scegli_immagine"
         app:layout_constraintBottom_toBottomOf="@+id/immagine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/immagine"
@@ -31,24 +31,26 @@
         android:id="@+id/nomeFarmacoEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nome farmaco"
+        android:hint="@string/nome_farmaco"
         android:inputType="textCapWords"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/immagine" />
+        app:layout_constraintTop_toBottomOf="@+id/immagine"
+        android:autofillHints="" />
 
     <EditText
         android:id="@+id/quantitaTotaleEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:hint="Quantità nella confezione"
+        android:hint="@string/quantit_nella_confezione"
         android:inputType="number"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText"
+        android:autofillHints="" />
 
     <LinearLayout
         android:id="@+id/linear1"
@@ -65,11 +67,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:hint="Quantità da assumere"
+            android:hint="@string/quantit_da_assumere"
             android:inputType="number"
             android:minHeight="48dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/nomeFarmacoEditText"
+            android:autofillHints="" />
 
         <Spinner
             android:id="@+id/ogniQuantoSpinner"
@@ -89,18 +92,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="Orario inizio"
+        android:hint="@string/orario_inizio"
         android:inputType="time"
         android:minHeight="48dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linear1" />
+        app:layout_constraintTop_toBottomOf="@+id/linear1"
+        android:autofillHints="" />
 
     <Button
         android:id="@+id/buttonTimePicker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Scegli orario"
+        android:text="@string/scegli_orario"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/editTextTime"
         app:layout_constraintTop_toBottomOf="@+id/linear1" />
@@ -111,7 +115,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
-        android:text="Quali giorni: da lunedì a venerdì"
+        android:text="@string/quali_giorni_da_luned_a_venerd"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/editTextTime"
         app:layout_constraintTop_toBottomOf="@+id/editTextTime" />
@@ -132,9 +136,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="ToggleButton"
-            android:textOff="L"
-            android:textOn="L" />
+            android:text="@string/togglebutton"
+            android:textOff="@string/l"
+            android:textOn="@string/L" />
 
         <ToggleButton
             android:id="@+id/marToggleButton"
@@ -142,9 +146,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="ToggleButton"
-            android:textOff="M"
-            android:textOn="M" />
+            android:text="@string/togglebutton2"
+            android:textOff="@string/m"
+            android:textOn="@string/M" />
 
         <ToggleButton
             android:id="@+id/merToggleButton"
@@ -152,9 +156,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="ToggleButton"
-            android:textOff="M"
-            android:textOn="M" />
+            android:text="@string/togglebutton3"
+            android:textOff="@string/m2"
+            android:textOn="@string/M2" />
 
         <ToggleButton
             android:id="@+id/gioToggleButton"
@@ -162,9 +166,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="ToggleButton"
-            android:textOff="G"
-            android:textOn="G" />
+            android:text="@string/togglebutton4"
+            android:textOff="@string/g"
+            android:textOn="@string/G" />
 
         <ToggleButton
             android:id="@+id/venToggleButton"
@@ -172,27 +176,27 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:checked="true"
-            android:text="ToggleButton"
-            android:textOff="V"
-            android:textOn="V" />
+            android:text="@string/togglebutton5"
+            android:textOff="@string/v"
+            android:textOn="@string/V" />
 
         <ToggleButton
             android:id="@+id/sabToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="ToggleButton"
-            android:textOff="S"
-            android:textOn="S" />
+            android:text="@string/togglebutton6"
+            android:textOff="@string/s"
+            android:textOn="@string/S" />
 
         <ToggleButton
             android:id="@+id/domToggleButton"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="ToggleButton"
-            android:textOff="D"
-            android:textOn="D" />
+            android:text="@string/togglebutton7"
+            android:textOff="@string/d"
+            android:textOn="@string/D" />
 
 
     </LinearLayout>
@@ -210,7 +214,7 @@
         android:id="@+id/caricaButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Carica"
+        android:text="@string/carica"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/mostraCaricaTextView"
         app:layout_constraintStart_toStartOf="parent" />
@@ -219,7 +223,7 @@
         android:id="@+id/mostraCaricaTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mostra Caricamenti"
+        android:text="@string/mostra_caricamenti"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

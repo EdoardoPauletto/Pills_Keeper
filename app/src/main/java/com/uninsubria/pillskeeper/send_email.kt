@@ -3,11 +3,11 @@ package com.uninsubria.pillskeeper
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
+//import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
 class send_email : AppCompatActivity() {
-    private lateinit var button: Button
+    //private lateinit var button: Button
 
     /*private lateinit var sendto: EditText
     private lateinit var subject: EditText
@@ -15,7 +15,7 @@ class send_email : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_send_email)
+        //setContentView(R.layout.activity_send_email)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true) //mostra il back in alto
 
