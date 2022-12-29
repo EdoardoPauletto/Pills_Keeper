@@ -194,13 +194,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun caricaFarmaci(){
         listaFarmaci.clear()
+        listaKey.clear()
         val farmaciDB = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
-        farmaciDB.child("farmaci/").addValueEventListener(object: ValueEventListener{
+        farmaciDB.child("farmaci/").addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()) {
-                    Toast.makeText(baseContext, "Non c'è cartella farmaci", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(baseContext, "Non ci sono farmaci", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
                     findViewById<ImageView>(R.id.imageView2).isVisible = false //disattivo testo e immagine
                     findViewById<TextView>(R.id.textView).isVisible = false
                     // prendo la recycleView

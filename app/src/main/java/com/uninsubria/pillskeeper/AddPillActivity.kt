@@ -1,20 +1,20 @@
 package com.uninsubria.pillskeeper
 
+import android.app.AlertDialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.provider.AlarmClock
 import android.text.Editable
-import android.text.format.DateFormat
+import android.util.Log
 import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -36,7 +36,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
     //private lateinit var textViewDay: TextView prossimamente
     private lateinit var progressBar: ProgressBar
     private lateinit var buttonUpload: Button
-    private lateinit var textViewShowUplaods: TextView
+    private lateinit var textViewUndoOrDelete: TextView
     private lateinit var imageUri: Uri //tipo url ma per i file
     //UPLOAD
     private lateinit var storageRef: StorageReference
@@ -60,7 +60,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         buttonTimePicker = findViewById(R.id.buttonTimePicker)
         progressBar = findViewById(R.id.progressBar)
         buttonUpload = findViewById(R.id.caricaButton)
-        textViewShowUplaods = findViewById(R.id.mostraCaricaTextView)
+        textViewUndoOrDelete = findViewById(R.id.annOcancTextView)
         //UPLOAD, con la string "uploads" andremo in quella cartella senò andiamo al top node
         storageRef = FirebaseStorage.getInstance().reference
         databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid + "/farmaci/")
@@ -68,22 +68,48 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         buttonChooseImage.setOnClickListener { openFileChooser() } //creare metodo
         buttonTimePicker.setOnClickListener { openTimePicker() }
         buttonUpload.setOnClickListener { uploadFile() }
-        textViewShowUplaods.setOnClickListener{
-            val openClockIntent = Intent(AlarmClock.ACTION_SET_ALARM) //apre direttamente l'orologio, funziona
-            openClockIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(openClockIntent)
-        }
+        textViewUndoOrDelete.setOnClickListener{ finish() }
         //quando modifica uno già esistente
         if(intent.hasExtra("key")){
             caricaDati()
         }
     }
 
+    private fun alertDelete() {
+        val builder = AlertDialog.Builder(this)
+        with(builder) {
+            setTitle("Attenzione")
+            setMessage("Vuoi davvero cancellare " + intent.getStringExtra("key")!! + "?")
+            setPositiveButton("Sì", delete)
+            setNegativeButton("No", undo)
+            show()
+        }
+    }
+    private val delete = { d: DialogInterface, which: Int ->
+        Toast.makeText(this, "Cancello " + intent.getStringExtra("key")!!, Toast.LENGTH_SHORT).show()
+        val farmaco = intent.getSerializableExtra("Farmaco") as Farmaco
+        storageRef.child(farmaco.mImageUrl).delete()
+        databaseRef.child(intent.getStringExtra("key")!!).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (child in snapshot.children){
+                    child.ref.removeValue()
+                }
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("TAG", error.message); //Don't ignore errors!
+            }
+        })
+        finish()
+    }
+    private val undo = { d: DialogInterface, which: Int ->
+        Toast.makeText(this, "Cancellazione annullata", Toast.LENGTH_SHORT).show()
+    }
+
     private fun openTimePicker() {//faccio selezionare un orario
         val calendario: Calendar = Calendar.getInstance()
-        val ore = calendario.get(Calendar.HOUR)
+        val ore = calendario.get(Calendar.HOUR_OF_DAY)
         val minuti = calendario.get(Calendar.MINUTE)
-        val timePickerDialog = TimePickerDialog(this, this, ore, minuti, DateFormat.is24HourFormat(this))
+        val timePickerDialog = TimePickerDialog(this, this, ore, minuti, true)
         timePickerDialog.show()
     }
 
@@ -141,30 +167,49 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                         progressBar.progress = progress.toInt() //aggiorno la progress bar
                     }
                     .addOnSuccessListener { taskSnapshot ->//quando upload finisce
-                        Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
-
                         //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
                         val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toInt(), qnt.toInt(), hourspinner, time)
                         //crea nuova entrata nel db con unico id
                         val uploadId = databaseRef.push().key
                         //prendo id e gli setto i dati dell'upload file che contiene nome, immagine, ecc...
                         databaseRef.child(uploadId!!).setValue(upload)
-
                     }
                     .addOnFailureListener { e -> //azioni quando upload non avviene
                         Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                     }
                     .addOnCompleteListener{ //quando finisce, aspetto un attimo e poi torno al main
+                        Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
                         Thread.sleep(2000)
                         finish() //chiude questa e torna a quella prima
                     }
             } else {
                 Toast.makeText(this, "Nessun file selezionato", Toast.LENGTH_SHORT).show()
             }
-        }
-        else {
-            //modifico i valori
-
+        } else {//modifico i valori
+            val farmaco = intent.getSerializableExtra("Farmaco") as Farmaco
+            val key = intent.getStringExtra("key")
+            if (this::imageUri.isInitialized) {
+                val fileReference = storageRef.child(farmaco.mImageUrl) //nello stesso percorso della vecchia
+                fileReference.putFile(imageUri) //sovrascrivo
+                    .addOnProgressListener { tasksnapshot ->
+                        val progress = 100.0 * tasksnapshot.bytesTransferred / tasksnapshot.totalByteCount
+                        progressBar.progress = progress.toInt() //aggiorno la progress bar
+                    }
+                    .addOnSuccessListener { taskSnapshot ->//quando upload finisce
+                        //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toInt(), qnt.toInt(), hourspinner, time)
+                        databaseRef.child(key!!).setValue(upload)
+                    }
+                    .addOnFailureListener { e -> //quando non avviene
+                        Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
+                    }
+            } else {//modifico solo i dati
+                val upload = Farmaco(pillName, farmaco.mImageUrl, qntTot.toInt(), qnt.toInt(), hourspinner, time)
+                databaseRef.child(key!!).setValue(upload)
+            }
+            Toast.makeText(this, "Modifica riuscita", Toast.LENGTH_LONG).show()
+            Thread.sleep(1000)
+            finish() //chiude questa e torna a quella prima
         }
     }
 
@@ -183,5 +228,8 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         editTextTime.text = Editable.Factory.getInstance().newEditable(farmaco.time)
         mod = true
         buttonUpload.text = "Modifica"
+        textViewUndoOrDelete.text = "Cancella"
+        textViewUndoOrDelete.setTextColor(Color.RED)
+        textViewUndoOrDelete.setOnClickListener{ alertDelete() }
     }
 }

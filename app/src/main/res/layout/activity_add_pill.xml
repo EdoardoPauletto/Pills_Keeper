@@ -216,14 +216,14 @@
         android:layout_height="wrap_content"
         android:text="@string/carica"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/mostraCaricaTextView"
+        app:layout_constraintEnd_toStartOf="@+id/annOcancTextView"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/mostraCaricaTextView"
+        android:id="@+id/annOcancTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/mostra_caricamenti"
+        android:text="@string/annulla"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
