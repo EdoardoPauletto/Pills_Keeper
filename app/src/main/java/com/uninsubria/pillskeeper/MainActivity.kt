@@ -30,14 +30,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
     lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
     val listaFarmaci = ArrayList<Farmaco>()
+    val listaKey = ArrayList<String>()
     private companion object{
         private const val CHANNEL_ID = "canale01"
     }
@@ -210,6 +211,7 @@ class MainActivity : AppCompatActivity() {
 
                     // lista degli elementi da inserire
                     for (f in snapshot.children){
+                        listaKey.add(f.key.toString())
                         val tmp = f.getValue(Farmaco::class.java)
                         //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
                         listaFarmaci.add(tmp!!)
@@ -232,8 +234,8 @@ class MainActivity : AppCompatActivity() {
     private fun onListItemClick(position: Int) {
         //Toast.makeText(baseContext, "ciao " + listaFarmaci[position].name, Toast.LENGTH_SHORT).show()
         val intent = Intent(this, AddPillActivity::class.java)
-        intent.putExtra("nomeFarmaco", listaFarmaci[position].name)
-        intent.putExtra("imgFarmaco", listaFarmaci[position].mImageUrl)
+        intent.putExtra("key", listaKey[position])
+        intent.putExtra("Farmaco", listaFarmaci[position])
         startActivity(intent)
     }
 

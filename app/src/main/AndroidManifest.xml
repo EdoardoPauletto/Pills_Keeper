@@ -19,13 +19,6 @@
         android:theme="@style/Theme.PillsKeeper"
         tools:targetApi="31">
         <activity
-            android:name=".send_email"
-            android:exported="false">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.uninsubria.pillskeeper.MainActivity" />
-        </activity>
-        <activity
             android:name=".ForgotPassword"
             android:exported="false">
             <meta-data

@@ -74,18 +74,8 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
             startActivity(openClockIntent)
         }
         //quando modifica uno già esistente
-        if(intent.hasExtra("nomeFarmaco") && intent.extras!!.size() == 2){
-            val nomeFarmaco = intent.getStringExtra("nomeFarmaco")
-            val imgFarmaco = intent.getStringExtra("imgFarmaco")
-            editTextPillName.text = Editable.Factory.getInstance().newEditable(nomeFarmaco)
-            Farmaco().convertImg(imgFarmaco!!).downloadUrl.addOnSuccessListener { uri ->
-                // Pass it to Picasso to download, show in ImageView and caching
-                Picasso.get().load(uri.toString()).into(imageView)
-            }.addOnFailureListener {
-                // Handle any errors
-            }
-            mod = true
-            buttonUpload.text = "Modifica"
+        if(intent.hasExtra("key")){
+            caricaDati()
         }
     }
 
@@ -176,5 +166,22 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
             //modifico i valori
 
         }
+    }
+
+    private fun caricaDati() {
+        val farmaco = intent.getSerializableExtra("Farmaco") as Farmaco
+        farmaco.convertImg().downloadUrl.addOnSuccessListener { uri ->
+            Picasso.get().load(uri.toString()).into(imageView)
+        }.addOnFailureListener {
+            // Handle any errors
+        }
+        editTextPillName.text = Editable.Factory.getInstance().newEditable(farmaco.name)
+        editTextQntTot.text = Editable.Factory.getInstance().newEditable(farmaco.qTot.toString())
+        editTextQnt.text = Editable.Factory.getInstance().newEditable(farmaco.q.toString())
+        val orari = resources.getStringArray(R.array.orari_allarmi)
+        spinnerWhen.setSelection(orari.indexOf(farmaco.every))
+        editTextTime.text = Editable.Factory.getInstance().newEditable(farmaco.time)
+        mod = true
+        buttonUpload.text = "Modifica"
     }
 }
