@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="orari_allarmi">
+    <array name="AllarmTime">
         <item>Ogni 30 min</item>
         <item>Ogni 1 ora</item>
         <item>Ogni 2 ore</item>
