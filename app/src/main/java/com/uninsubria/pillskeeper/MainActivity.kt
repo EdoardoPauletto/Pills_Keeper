@@ -22,10 +22,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -35,6 +39,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
@@ -260,7 +265,7 @@ class MainActivity : AppCompatActivity() {
         for (f in listaFarmaci){
             val h = f.time.split(":")[0]
             val m = f.time.split(":")[1]
-            val calendar: Calendar = Calendar.getInstance()
+            val calendar = Calendar.getInstance()
             calendar.set(
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -269,37 +274,12 @@ class MainActivity : AppCompatActivity() {
                 m.toInt(),
                 0
             )
-            /*val service = Intent(this, MyService::class.java)
-            service.putExtra("f", f)
-            startService(service)*/
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                createAlarm(calendar.timeInMillis, f)
-            }
+            val diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
+            val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
+                .setInitialDelay(diff, TimeUnit.SECONDS)
+                .setInputData(workDataOf("nome" to f.name))
+                .build()
+            WorkManager.getInstance(this).enqueue(workRequest)
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createAlarm(t: Long, f: Farmaco) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT >= 31){
-            if (!alarmManager.canScheduleExactAlarms()) { //da android 12 bisogna dare il permesso
-                val intent = Intent()
-                intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                startActivity(intent)
-            }
-            //Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
-        }
-        val intent = Intent(this, AlarmReceiver::class.java)
-        //intent.putExtra("tel", 331)
-        intent.putExtra("nome", f.name)
-        //mail medico
-        val pendingIntent = PendingIntent.getBroadcast(this, t.toInt(), intent, FLAG_MUTABLE)
-        alarmManager.setRepeating(
-            AlarmManager.RTC,
-            t,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
-        Toast.makeText(this, "Alarm is set at ${f.time}", Toast.LENGTH_SHORT).show()
     }
 }
