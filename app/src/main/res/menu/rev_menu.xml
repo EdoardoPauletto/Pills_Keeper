@@ -15,6 +15,6 @@
         android:title="prova notifica"
         app:showAsAction="never"/>
     <item android:id="@+id/logout"
-        android:title="Esci"
+        android:title="Esci dall'account"
         app:showAsAction="never"/>
 </menu>

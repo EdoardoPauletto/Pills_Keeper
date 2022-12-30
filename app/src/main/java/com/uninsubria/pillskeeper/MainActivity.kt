@@ -1,12 +1,10 @@
 package com.uninsubria.pillskeeper
 
 import android.Manifest
-import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.app.PendingIntent.FLAG_MUTABLE
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -19,6 +17,7 @@ import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId){
             R.id.sms -> sendSMS()
             R.id.email -> sendEmail()
-            R.id.not -> Notification()
+            R.id.not -> setAlarm()
             R.id.logout -> onLogoutClick()
             //R.id.geo -> setAlarm()
             R.id.geo -> openMaps()
@@ -125,9 +124,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onLogoutClick(){
+        val builder = AlertDialog.Builder(this)
+        with(builder) {
+            setTitle("Attenzione")
+            setMessage("Vuoi davvero effettuare il logout dall'account " + auth.currentUser!!.email + " ?")
+            setPositiveButton("Sì", logout)
+            setNegativeButton("No", undo)
+            show()
+        }
+    }
+    private val logout = { d: DialogInterface, which: Int ->
+        Toast.makeText(this, "Logout...", Toast.LENGTH_SHORT).show()
         //auth.signOut() ne basta uno dei due, da capire perchè
         Firebase.auth.signOut()
         onStart()
+    }
+    private val undo = { d: DialogInterface, which: Int ->
+        Toast.makeText(this, "Operazione annullata", Toast.LENGTH_SHORT).show()
     }
 
     private fun Notification(){
@@ -170,33 +183,6 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, AddPillActivity::class.java)
         startActivity(intent)
         //finish() non va terminata
-        //SMS
-       /* val smsManager: SmsManager = SmsManager.getDefault()
-        smsManager.sendTextMessage("+39 " + myNumber, null, myMsg, null, null)
-        Toast.makeText(this, "Message Sent", Toast.LENGTH_SHORT).show()*/
-        //oppure
-        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number, null)));
-        //o
-
-        //mail
-       /* Intent emailIntent = new Intent(Intent.ACTION_SEND);
-      
-        emailIntent.setData(Uri.parse("mailto:"));
-        emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
-        emailIntent.putExtra(Intent.EXTRA_CC, CC);
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Your subject");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "Email message goes here");
-        startActivity(Intent.createChooser(emailIntent, "Send mail..."));
-        //oppure
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
-        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
-        intent.putExtra(Intent.EXTRA_SUBJECT, "");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }*/
-        //recycleView https://www.geeksforgeeks.org/android-recyclerview-in-kotlin/ (foto, nome, quantità da assumere, quantità confezione)
     }
 
     override fun onStart() { //quando l'app si avvia
@@ -205,8 +191,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LogInActivity::class.java) //vado al login
             startActivity(intent)
             finish()
-        } else
+        } else{
             caricaFarmaci()
+            //setAlarm()
+        }
     }
     /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (id == R.id.action_settings){
@@ -269,15 +257,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAlarm(){
-        /*val calendar: Calendar = Calendar.getInstance()
-        calendar.set(
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH),
-            17,
-            10,
-            0
-        )*/
+        for (f in listaFarmaci){
+            val h = f.time.split(":")[0]
+            val m = f.time.split(":")[1]
+            val calendar: Calendar = Calendar.getInstance()
+            calendar.set(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH),
+                h.toInt(),
+                m.toInt(),
+                0
+            )
+            /*val service = Intent(this, MyService::class.java)
+            service.putExtra("f", f)
+            startService(service)*/
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createAlarm(calendar.timeInMillis, f)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createAlarm(t: Long, f: Farmaco) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (Build.VERSION.SDK_INT >= 31){
             if (!alarmManager.canScheduleExactAlarms()) { //da android 12 bisogna dare il permesso
@@ -285,17 +287,19 @@ class MainActivity : AppCompatActivity() {
                 intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
                 startActivity(intent)
             }
-            Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
+            //Toast.makeText(this, "Può? " + alarmManager.canScheduleExactAlarms(), Toast.LENGTH_SHORT).show()
         }
         val intent = Intent(this, AlarmReceiver::class.java)
-        intent.putExtra("tel", 331)
+        //intent.putExtra("tel", 331)
+        intent.putExtra("nome", f.name)
         //mail medico
-        val pendingIntent = PendingIntent.getBroadcast(this, 5, intent, FLAG_MUTABLE)
-        alarmManager.set(
+        val pendingIntent = PendingIntent.getBroadcast(this, t.toInt(), intent, FLAG_MUTABLE)
+        alarmManager.setRepeating(
             AlarmManager.RTC,
-            3000,
+            t,
+            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
-        //Toast.makeText(this, "Alarm is set", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Alarm is set at ${f.time}", Toast.LENGTH_SHORT).show()
     }
 }

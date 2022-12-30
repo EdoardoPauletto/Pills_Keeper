@@ -36,7 +36,7 @@ class PilloleAdapter(private val lista: List<Farmaco>, private val onItemClicked
         }
         // imposta il testo
         holder.textView.text = elemento.name
-        holder.textView2.text = "${elemento.q}  - ${elemento.time}"
+        holder.textView2.text = "Da prenderne ${elemento.q} alle ore ${elemento.time}"
     }
 
     // restituisce il numero di elementi della lista
