@@ -61,9 +61,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.sms -> sendSMS()
-            R.id.email -> sendEmail()
-            R.id.not -> setAlarm()
+            R.id.not -> Notification()
             R.id.logout -> onLogoutClick()
             //R.id.geo -> setAlarm()
             R.id.geo -> openMaps()
@@ -103,25 +101,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendSMS(){
-        /*val obj : SmsManager = SmsManager.getDefault() //a me da errore
-        obj.sendTextMessage("+39 3467635500", null, "sei malato", null, null)*/
-        /*val it =  Intent(Intent.ACTION_SENDTO, 3467635500);
-        it.putExtra("sms_body", "Here you can set the SMS text to be sent");
-        startActivity(it);*/
-            val uri = Uri.parse("smsto:3776894189")
-            val intent = Intent(Intent.ACTION_SENDTO, uri)
-            intent.putExtra("sms_body", "Here goes your message...")
-            startActivity(intent)
-
-    }
-
-    private fun sendEmail(){
-        val testIntent = Intent(Intent.ACTION_VIEW)
-        val data: Uri = Uri.parse("mailto:?subject=" + "blah blah subject" + "&body=" + "blah blah body" + "&to=" + "giangifumagalli1@gmail.com")
-        testIntent.data = data
-        startActivity(testIntent)
-    }
 
     private fun onLogoutClick(){
         val builder = AlertDialog.Builder(this)
@@ -148,20 +127,23 @@ class MainActivity : AppCompatActivity() {
 
         val date = Date()
         val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(date).toInt()
-
-        val intent = Intent(this, AddPillActivity::class.java)
-        intent.putExtra("key", "35")
-        //startActivity(intent)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val mainPendingInetnt = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_IMMUTABLE)
+        val smsIntent = Intent(this, sms::class.java)
+        smsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val smsPendingIntent = PendingIntent.getActivity(this, 1, smsIntent, PendingIntent.FLAG_IMMUTABLE)
+        val emailIntent = Intent(this, email::class.java)
+        emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val emailPendingIntent = PendingIntent.getActivity(this, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-        notificationBuilder.setSmallIcon(R.drawable.pill_icon_main)
-        notificationBuilder.setContentTitle("Aspetta Aspetta ASPETTA")
-        notificationBuilder.setContentText("non hai nessuna medicina aggiunta o almeno segnalata")
+        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher_foreground)
+        notificationBuilder.setContentTitle("Salve")
+        notificationBuilder.setContentText("è mio compito avvertirla che la pillola ... è terminata")
         notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
         notificationBuilder.setAutoCancel(true)
-        notificationBuilder.setContentIntent(mainPendingInetnt)
+        notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
+        notificationBuilder.setContentIntent(smsPendingIntent)
+        notificationBuilder.addAction(R.drawable.ic_baseline_email_24, "email a medico", emailPendingIntent )
+        notificationBuilder.setContentIntent(emailPendingIntent)
         val notifictionmanagerCompat = NotificationManagerCompat.from(this)
         notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
     }

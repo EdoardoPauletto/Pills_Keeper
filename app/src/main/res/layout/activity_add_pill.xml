@@ -9,10 +9,10 @@
 
 
     <ImageView
-        android:id="@+id/immagine"
+        android:id="@+id/Imm"
         android:layout_width="154dp"
         android:layout_height="158dp"
-        android:contentDescription="@string/immagine_del_farmaco"
+        android:contentDescription="@string/FarmacoImm"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/images" />
@@ -21,22 +21,22 @@
         android:id="@+id/selectFileButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/scegli_immagine"
-        app:layout_constraintBottom_toBottomOf="@+id/immagine"
+        android:text="@string/ImmChoice"
+        app:layout_constraintBottom_toBottomOf="@+id/Imm"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/immagine"
+        app:layout_constraintStart_toEndOf="@+id/Imm"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
         android:id="@+id/nomeFarmacoEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/nome_farmaco"
+        android:hint="@string/FarmacoName"
         android:inputType="textCapWords"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/immagine"
+        app:layout_constraintTop_toBottomOf="@+id/Imm"
         android:autofillHints="" />
 
     <EditText
@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:hint="@string/quantit_nella_confezione"
+        android:hint="@string/qtConfezione"
         android:inputType="number"
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="2"
-            android:hint="@string/quantit_da_assumere"
+            android:hint="@string/qtDose"
             android:inputType="numberDecimal"
             android:minHeight="48dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:entries="@array/orari_allarmi"
+            android:entries="@array/AllarmTime"
             android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/editTextNumber"
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint="@string/orario_inizio"
+        android:hint="@string/TimeInizio"
         android:inputType="time"
         android:minHeight="48dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/scegli_orario"
+        android:text="@string/TimeChoice"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/editTextTime"
         app:layout_constraintTop_toBottomOf="@+id/linear1" />
@@ -115,7 +115,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
-        android:text="@string/quali_giorni_da_luned_a_venerd"
+        android:text="@string/DaysChoice"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="@+id/editTextTime"
         app:layout_constraintTop_toBottomOf="@+id/editTextTime" />

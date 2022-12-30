@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="@string/benvenuto_su"
+        android:text="@string/welcome"
         android:textColor="#FFFFFF"
         android:textSize="36sp" />
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="@string/pills_keeper"
+        android:text="@string/pillsKeeper"
         android:textColor="#FFFFFF"
         android:textSize="44sp"
         android:textStyle="bold"/>
@@ -80,7 +80,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:ems="10"
-        android:hint="@string/numero_di_telefono_cellulare"
+        android:hint="@string/PhoneNumber"
         android:inputType="phone"
         android:maxLength="10"
         android:minHeight="48dp"
@@ -93,7 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:ems="10"
-        android:hint="@string/indirizzo_e_mail_del_medico_curante"
+        android:hint="@string/emailMed"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
         android:textColorHint="@color/white"
@@ -111,7 +111,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="15dp"
-        android:text="@string/hai_gi_un_account"
+        android:text="@string/AlreadyAccount"
         android:textColor="@color/white"/>
 
 </LinearLayout>

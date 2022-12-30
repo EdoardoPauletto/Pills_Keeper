@@ -54,7 +54,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         supportActionBar?.setDisplayHomeAsUpEnabled(true) //mostra il back in alto
 
         auth = Firebase.auth
-        imageView = findViewById(R.id.immagine)
+        imageView = findViewById(R.id.Imm)
         buttonChooseImage = findViewById(R.id.selectFileButton) //gli assegno il reale elemento
         editTextPillName = findViewById(R.id.nomeFarmacoEditText)
         editTextQntTot = findViewById(R.id.quantitaTotaleEditText)
@@ -251,7 +251,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         editTextPillName.text = Editable.Factory.getInstance().newEditable(farmaco.name)
         editTextQntTot.text = Editable.Factory.getInstance().newEditable(farmaco.qTot.toString())
         editTextQnt.text = Editable.Factory.getInstance().newEditable(farmaco.q.toString())
-        val orari = resources.getStringArray(R.array.orari_allarmi)
+        val orari = resources.getStringArray(R.array.AllarmTime)
         spinnerWhen.setSelection(orari.indexOf(farmaco.every))
         editTextTime.text = Editable.Factory.getInstance().newEditable(farmaco.time)
         mod = true
