@@ -66,9 +66,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            R.id.not -> Notification()
+            //R.id.not -> Notification()
             R.id.logout -> onLogoutClick()
-            //R.id.geo -> setAlarm()
+            R.id.not -> setAlarm()
             R.id.geo -> openMaps()
         }
         return super.onOptionsItemSelected(item)
@@ -93,8 +93,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             1 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
                         Toast.makeText(this, "permesso consentito", Toast.LENGTH_SHORT).show()
                     }
@@ -117,13 +116,13 @@ class MainActivity : AppCompatActivity() {
             show()
         }
     }
-    private val logout = { d: DialogInterface, which: Int ->
+    private val logout = { _: DialogInterface, _: Int ->
         Toast.makeText(this, "Logout...", Toast.LENGTH_SHORT).show()
         //auth.signOut() ne basta uno dei due, da capire perchè
         Firebase.auth.signOut()
         onStart()
     }
-    private val undo = { d: DialogInterface, which: Int ->
+    private val undo = { _: DialogInterface, _: Int ->
         Toast.makeText(this, "Operazione annullata", Toast.LENGTH_SHORT).show()
     }
 
@@ -131,12 +130,15 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
 
         val date = Date()
-        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(date).toInt()
-        val smsIntent = Intent(this, sms::class.java)
-        smsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()
+
+        val uri = Uri.parse("smsto:+393467635500")
+        val smsIntent = Intent(Intent.ACTION_SENDTO, uri)
+        smsIntent.putExtra("sms_body", "mi dovresti andare a comprare la .... , grazie")
         val smsPendingIntent = PendingIntent.getActivity(this, 1, smsIntent, PendingIntent.FLAG_IMMUTABLE)
-        val emailIntent = Intent(this, email::class.java)
-        emailIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val emailIntent = Intent(Intent.ACTION_VIEW)
+        val data: Uri = Uri.parse("mailto:?subject=" + "Buongiorno dottore" + "&body=" + "Volevo avvisarla che ho esaurito la ...." + "&to=" + "giangifumagalli1@gmail.com")
+        emailIntent.data = data
         val emailPendingIntent = PendingIntent.getActivity(this, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
 
         val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -144,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         notificationBuilder.setContentTitle("Salve")
         notificationBuilder.setContentText("è mio compito avvertirla che la pillola ... è terminata")
         notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
-        notificationBuilder.setAutoCancel(true)
+        notificationBuilder.setAutoCancel(false) //almeno rimane anche dopo averci cliccato
         notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
         notificationBuilder.setContentIntent(smsPendingIntent)
         notificationBuilder.addAction(R.drawable.ic_baseline_email_24, "email a medico", emailPendingIntent )
@@ -244,7 +246,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAlarm(){
-        for (f in listaFarmaci){
+        for ((i, f) in listaFarmaci.withIndex()){
             val h = f.time.split(":")[0]
             val m = f.time.split(":")[1]
             val calendar = Calendar.getInstance()
@@ -259,7 +261,7 @@ class MainActivity : AppCompatActivity() {
             val diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
             val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
                 .setInitialDelay(diff, TimeUnit.SECONDS)
-                .setInputData(workDataOf("nome" to f.name))
+                .setInputData(workDataOf("key" to listaKey[i]))
                 .build()
             WorkManager.getInstance(this).enqueue(workRequest)
         }
