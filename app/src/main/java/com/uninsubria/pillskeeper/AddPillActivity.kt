@@ -181,8 +181,10 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         val time = editTextTime.text.toString().trim()
         if (pillName.isEmpty()) editTextPillName.error = "Inserire il nome del farmaco"
         else if (qntTot.isEmpty()) editTextQntTot.error = "Inserire la quantità della confezione"
+        else if (qntTot.toDouble() == 0.0) editTextQntTot.error = "Inserire una quantità maggiore di 0"
+        else if (qnt.toDouble() == 0.0) editTextQnt.error = "Inserire una quantità maggiore di 0"
         else if (qnt.isEmpty()) editTextQnt.error = "Inserire quantità da assumere"
-        else if (qntTot.toInt() < qnt.toDouble()) editTextQnt.error = "Non possono essere meno di quelle in confezione"
+        else if (qntTot.toDouble() < qnt.toDouble()) editTextQnt.error = "Non possono essere meno di quelle in confezione"
         else if (time.isEmpty()) editTextTime.error = "Scegliere un orario"
         else if (!mod) {
              if (this::imageUri.isInitialized) { //controllo che sia stato dato un valore (essendo lateinit è sempre != null)
@@ -197,7 +199,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                     .addOnSuccessListener { taskSnapshot ->//quando upload finisce
                         Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
                         //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
-                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toInt(), qnt.toDouble(), hourspinner, time)
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
                         //crea nuova entrata nel db con unico id
                         val uploadId = databaseRef.push().key
                         //prendo id e gli setto i dati dell'upload file che contiene nome, immagine, ecc...
@@ -225,14 +227,14 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                     }
                     .addOnSuccessListener { taskSnapshot ->//quando upload finisce
                         //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
-                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toInt(), qnt.toDouble(), hourspinner, time)
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
                         databaseRef.child(key!!).setValue(upload)
                     }
                     .addOnFailureListener { e -> //quando non avviene
                         Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                     }
             } else {//modifico solo i dati
-                val upload = Farmaco(pillName, farmaco.mImageUrl, qntTot.toInt(), qnt.toDouble(), hourspinner, time)
+                val upload = Farmaco(pillName, farmaco.mImageUrl, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
                 databaseRef.child(key!!).setValue(upload)
             }
             Toast.makeText(this, "Modifica riuscita", Toast.LENGTH_LONG).show()

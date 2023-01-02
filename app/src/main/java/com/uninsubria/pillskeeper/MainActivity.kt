@@ -247,23 +247,27 @@ class MainActivity : AppCompatActivity() {
 
     private fun setAlarm(){
         for ((i, f) in listaFarmaci.withIndex()){
-            val h = f.time.split(":")[0]
-            val m = f.time.split(":")[1]
-            val calendar = Calendar.getInstance()
-            calendar.set(
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH),
-                h.toInt(),
-                m.toInt(),
-                0
-            )
-            val diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
-            val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-                .setInitialDelay(diff, TimeUnit.SECONDS)
-                .setInputData(workDataOf("key" to listaKey[i]))
-                .build()
-            WorkManager.getInstance(this).enqueue(workRequest)
+            if (f.qTot > 0){//quelli esauriti non li schedulo
+                val h = f.time.split(":")[0]
+                val m = f.time.split(":")[1]
+                val calendar = Calendar.getInstance()
+                calendar.set(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH),
+                    h.toInt(),
+                    m.toInt(),
+                    0
+                )
+                var diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
+                if (diff<0)
+                    diff+=86400 //aggiungo 24h
+                val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
+                    .setInitialDelay(diff, TimeUnit.SECONDS)
+                    .setInputData(workDataOf("key" to listaKey[i]))
+                    .build()
+                WorkManager.getInstance(this).enqueue(workRequest)
+            }
         }
     }
 }

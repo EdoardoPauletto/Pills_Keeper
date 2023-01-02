@@ -7,30 +7,75 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
     private val CHANNEL_ID = "canale01"
+    private val databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + Firebase.auth.currentUser!!.uid + "/farmaci/")
+    private lateinit var farmaco: Farmaco
 
     override fun doWork(): Result {
-        val key = inputData.getString("key")
         //leggi dal db info farmaco
-        createNotificationChannel()
-        sendNotification()
         //qntTot - q (perchè presa una)
         //if qntTot <= 2 avviso farmaco quasi finito
         //leggi orario
         //rischedula, richiamando il worker ad un altro orario
+        val key = inputData.getString("key")
+        databaseRef.child(key!!).addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                farmaco = snapshot.getValue(Farmaco::class.java)!!
+                createNotificationChannel()
+                sendRemainderNotification()
+                aggiornaQnt(key)
+                riSchedula(key)
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("TAG", error.message); //Don't ignore errors!
+            }
+        })
 
         return Result.success()
     }
 
-    private fun sendNotification() {
+    private fun sendRemainderNotification() {
+        val main = Intent(c, MainActivity::class.java)
+        val pendingMain = PendingIntent.getActivity(c, 3, main, PendingIntent.FLAG_IMMUTABLE)
+        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()//così se più notifiche allo stesso tempo non va
+        val notificationBuilder = NotificationCompat.Builder(c, CHANNEL_ID)
+        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher_foreground)
+        notificationBuilder.setContentTitle("Sveglia")
+        notificationBuilder.setContentText("Sono le ${farmaco.time}, è l'ora di prendere ${farmaco.q} di ${farmaco.name}")
+        notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+        notificationBuilder.setAutoCancel(false) //almeno rimane anche dopo averci cliccato
+        notificationBuilder.setContentIntent(pendingMain)
+        val notifictionmanagerCompat = NotificationManagerCompat.from(c)
+        notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
+    }
+
+    private fun aggiornaQnt(key: String) {
+        farmaco.qTot = farmaco.qTot - farmaco.q
+        databaseRef.child(key).setValue(farmaco)
+        if ((farmaco.qTot-farmaco.q*2) <= 0)
+            sendFewPillsNotification()
+    }
+
+    private fun sendFewPillsNotification() {
         val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()//così se più notifiche allo stesso tempo non va
         val uri = Uri.parse("smsto:+393467635500, +393334678999")//si possono mettere tutti i numeri
         val smsIntent = Intent(Intent.ACTION_SENDTO, uri)
@@ -42,8 +87,9 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         val emailPendingIntent = PendingIntent.getActivity(c, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
         val notificationBuilder = NotificationCompat.Builder(c, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.mipmap.ic_launcher_foreground)
-        notificationBuilder.setContentTitle("Sveglia")
-        notificationBuilder.setContentText("Sono le 12:30, è l'ora di prendere n di farmaco")
+        notificationBuilder.setContentTitle("Attenzione!")
+        notificationBuilder.setContentText("Rimangono solo ${farmaco.qTot} di ${farmaco.name}, stanno per finire!")
+        if (farmaco.qTot == 1.0) notificationBuilder.setContentText("Rimane solo 1 di ${farmaco.name}, stanno per finire!")
         notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
         notificationBuilder.setAutoCancel(false) //almeno rimane anche dopo averci cliccato
         notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
@@ -52,6 +98,16 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         notificationBuilder.setContentIntent(emailPendingIntent)
         val notifictionmanagerCompat = NotificationManagerCompat.from(c)
         notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
+    }
+
+    private fun riSchedula(key: String){
+        if (farmaco.qTot > 0){
+            val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
+                .setInitialDelay(1, TimeUnit.DAYS)
+                .setInputData(workDataOf("key" to key))
+                .build()
+            WorkManager.getInstance(c).enqueue(workRequest)
+        }
     }
 
     private fun createNotificationChannel(){

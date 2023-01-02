@@ -1,10 +1,12 @@
 package com.uninsubria.pillskeeper
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
@@ -36,7 +38,16 @@ class PilloleAdapter(private val lista: List<Farmaco>, private val onItemClicked
         }
         // imposta il testo
         holder.textView.text = elemento.name
-        holder.textView2.text = "Da prenderne ${elemento.q} alle ore ${elemento.time}"
+        if (elemento.qTot <= 0.0){
+            holder.textView2.text = "Esaurito!"
+            holder.textView2.setTextColor(Color.RED)
+        }
+        else if (elemento.qTot-elemento.q<=elemento.q){
+            holder.textView2.setTextColor("#b28704".toColorInt())
+            holder.textView2.text = "Da prenderne ${elemento.q} alle ore ${elemento.time} (Poche!)"
+        }
+        else
+            holder.textView2.text = "Da prenderne ${elemento.q} alle ore ${elemento.time}"
     }
 
     // restituisce il numero di elementi della lista
