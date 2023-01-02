@@ -7,7 +7,7 @@
     <string name="qtDose">Quantità da assumere</string>
     <string name="TimeInizio">Orario inizio</string>
     <string name="TimeChoice">Scegli orario</string>
-    <string name="DaysChoice">Quali giorni: da lunedì a venerdì</string>
+    <string name="DaysChoice">Quali giorni?  (default tutti)</string>
     <string name="togglebutton">ToggleButton</string>
     <string name="l">L</string>
     <string name="L">L</string>

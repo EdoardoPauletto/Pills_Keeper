@@ -40,10 +40,14 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         databaseRef.child(key!!).addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 farmaco = snapshot.getValue(Farmaco::class.java)!!
-                createNotificationChannel()
-                sendRemainderNotification()
-                aggiornaQnt(key)
-                riSchedula(key)
+                val sforo = farmaco.day[Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1]
+                if (!sforo){
+                    createNotificationChannel()
+                    sendRemainderNotification()
+                    aggiornaQnt(key)
+                    riSchedula(key, sforo)
+                } else
+                    riSchedula(key, sforo)
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.d("TAG", error.message); //Don't ignore errors!
@@ -100,13 +104,27 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
     }
 
-    private fun riSchedula(key: String){
+    private fun riSchedula(key: String, s: Boolean){
+        val now = Calendar.getInstance()
         if (farmaco.qTot > 0){
+            var delay = 0
+            var i = now.get(Calendar.DAY_OF_WEEK)-1
+            while (farmaco.day[i%7])
+                i++
+            delay = (i-(now.get(Calendar.DAY_OF_WEEK)-1))*1440 //oggi+(tra n giorni)-oggi *(minuti in 24h)
             val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-                .setInitialDelay(1, TimeUnit.DAYS)
                 .setInputData(workDataOf("key" to key))
-                .build()
-            WorkManager.getInstance(c).enqueue(workRequest)
+            if (!s){//se non sforo (sforo se per esempio imposto la prossima alle 2 di giovedì, ma giovedì non è tra i giorni true)
+                if (farmaco.every.contains("30"))
+                    delay += 30
+                else if (farmaco.every.contains("giorni")){
+                    //nulla
+                } else {
+                    delay += (farmaco.every.split(" ")[1].toInt()*60)
+                }
+            }
+            workRequest.setInitialDelay(delay.toLong(), TimeUnit.MINUTES)
+            WorkManager.getInstance(c).enqueue(workRequest.build())
         }
     }
 

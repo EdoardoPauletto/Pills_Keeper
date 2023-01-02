@@ -24,6 +24,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  {
@@ -118,8 +119,8 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
     }
 
     override fun onTimeSet(p0: TimePicker?, h: Int, m: Int) {//quando sel un orario
-        editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
         editTextTime.error = null //tolgo eventuale errore segnalato perchè vuoto
+        editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
     }
 
     private fun openFileChooser() {
@@ -174,11 +175,21 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
 
     //UPLOAD
     private fun uploadFile() {
+        val now = Calendar.getInstance()
+        Toast.makeText(this, now.get(Calendar.DAY_OF_WEEK).toString(), Toast.LENGTH_SHORT).show()
         val pillName = editTextPillName.text.toString().trim()
         val qntTot = editTextQntTot.text.toString().trim()
         val qnt = editTextQnt.text.toString().trim()
         val hourspinner = spinnerWhen.selectedItem.toString()
         val time = editTextTime.text.toString().trim()
+        val days = ArrayList<Boolean>(7)
+        days.add(findViewById<ToggleButton>(R.id.domToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.lunToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.marToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.merToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.gioToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.venToggleButton).isChecked)
+        days.add(findViewById<ToggleButton>(R.id.sabToggleButton).isChecked)
         if (pillName.isEmpty()) editTextPillName.error = "Inserire il nome del farmaco"
         else if (qntTot.isEmpty()) editTextQntTot.error = "Inserire la quantità della confezione"
         else if (qntTot.toDouble() == 0.0) editTextQntTot.error = "Inserire una quantità maggiore di 0"
@@ -186,6 +197,8 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         else if (qnt.isEmpty()) editTextQnt.error = "Inserire quantità da assumere"
         else if (qntTot.toDouble() < qnt.toDouble()) editTextQnt.error = "Non possono essere meno di quelle in confezione"
         else if (time.isEmpty()) editTextTime.error = "Scegliere un orario"
+        //else if (time.split(":")[0].toInt()<now.get(Calendar.HOUR_OF_DAY) || (time.split(":")[0].toInt()==now.get(Calendar.HOUR_OF_DAY) && time.split(":")[1].toInt()<=now.get(Calendar.MINUTE)))
+        //    editTextTime.error = "Non è possibile selezionare un orario passato"
         else if (!mod) {
              if (this::imageUri.isInitialized) { //controllo che sia stato dato un valore (essendo lateinit è sempre != null)
                 //mStorageRef punta alla cartella Storage
@@ -199,7 +212,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                     .addOnSuccessListener { taskSnapshot ->//quando upload finisce
                         Toast.makeText(this, "Upload riuscito", Toast.LENGTH_LONG).show()
                         //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
-                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time, days)
                         //crea nuova entrata nel db con unico id
                         val uploadId = databaseRef.push().key
                         //prendo id e gli setto i dati dell'upload file che contiene nome, immagine, ecc...
@@ -227,14 +240,14 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                     }
                     .addOnSuccessListener { taskSnapshot ->//quando upload finisce
                         //chiamo costruttore con edit text nome farmaco, percorso DELL'IMMAGINE (diverso per ogni utente), ecc...
-                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
+                        val upload = Farmaco(pillName, taskSnapshot.storage.path, qntTot.toDouble(), qnt.toDouble(), hourspinner, time, days)
                         databaseRef.child(key!!).setValue(upload)
                     }
                     .addOnFailureListener { e -> //quando non avviene
                         Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
                     }
             } else {//modifico solo i dati
-                val upload = Farmaco(pillName, farmaco.mImageUrl, qntTot.toDouble(), qnt.toDouble(), hourspinner, time)
+                val upload = Farmaco(pillName, farmaco.mImageUrl, qntTot.toDouble(), qnt.toDouble(), hourspinner, time, days)
                 databaseRef.child(key!!).setValue(upload)
             }
             Toast.makeText(this, "Modifica riuscita", Toast.LENGTH_LONG).show()
@@ -256,6 +269,13 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
         val orari = resources.getStringArray(R.array.AllarmTime)
         spinnerWhen.setSelection(orari.indexOf(farmaco.every))
         editTextTime.text = Editable.Factory.getInstance().newEditable(farmaco.time)
+        findViewById<ToggleButton>(R.id.domToggleButton).isChecked = farmaco.day[0]
+        findViewById<ToggleButton>(R.id.lunToggleButton).isChecked = farmaco.day[1]
+        findViewById<ToggleButton>(R.id.marToggleButton).isChecked = farmaco.day[2]
+        findViewById<ToggleButton>(R.id.merToggleButton).isChecked = farmaco.day[3]
+        findViewById<ToggleButton>(R.id.gioToggleButton).isChecked = farmaco.day[4]
+        findViewById<ToggleButton>(R.id.venToggleButton).isChecked = farmaco.day[5]
+        findViewById<ToggleButton>(R.id.sabToggleButton).isChecked = farmaco.day[6]
         mod = true
         buttonUpload.text = "Modifica"
         textViewUndoOrDelete.text = "Cancella"
