@@ -49,7 +49,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
                 //riSchedula(key, aggiornaOrario(key))
             }
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.message); //Don't ignore errors!
+                Log.d("TAG", error.message) //Don't ignore errors!
             }
         })
 
@@ -125,7 +125,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var numeri = ""
                 for (p in snapshot.children) {
-                    var tmp = p.getValue(ContattiFidati::class.java)
+                    val tmp = p.getValue(ContattiFidati::class.java)
                     if (numeri == "") numeri += tmp!!.tel
                     else numeri += ", ${tmp!!.tel}"
                 }
@@ -152,12 +152,12 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Log.d("TAG", error.message); //Don't ignore errors!
+                        Log.d("TAG", error.message) //Don't ignore errors!
                     }
                 })
             }
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.message); //Don't ignore errors!
+                Log.d("TAG", error.message) //Don't ignore errors!
             }
         })
     }

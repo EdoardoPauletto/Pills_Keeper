@@ -6,7 +6,7 @@
         android:title="Aggiorna"
         app:showAsAction="never"/>
     <item android:id="@+id/geo"
-        android:title="trova la farmacia più vivina"
+        android:title="Trova la farmacia più vicina"
         app:showAsAction="never"/>
     <item android:id="@+id/not"
         android:title="prova notifica"

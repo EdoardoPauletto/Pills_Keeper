@@ -1,6 +1,4 @@
 package com.uninsubria.pillskeeper
-import com.uninsubria.pillskeeper.R
-import com.uninsubria.pillskeeper.User
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -18,14 +16,14 @@ var utente = User()
 class SingUpActivity : AppCompatActivity() {
     //inizializzazione variabili
     private lateinit var auth: FirebaseAuth
-    lateinit var registerButton: Button
-    lateinit var nameEditText: EditText
-    lateinit var surnameEditText: EditText
-    lateinit var emailEditText: EditText
-    lateinit var passwordEditText: EditText
-    lateinit var emailMedico: EditText
-    lateinit var cellulare: EditText
-    lateinit var loginTextView: TextView
+    private lateinit var registerButton: Button
+    private lateinit var nameEditText: EditText
+    private lateinit var surnameEditText: EditText
+    private lateinit var emailEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var emailMedico: EditText
+    private lateinit var cellulare: EditText
+    private lateinit var loginTextView: TextView
     //persone fidate (da 1 a n) nome, cognome, ruolo(figlio,ecc)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,9 +31,9 @@ class SingUpActivity : AppCompatActivity() {
         setContentView(R.layout.activity_singup)
 
         auth = Firebase.auth //inizializza utente col db
-        registerButton = findViewById<Button>(R.id.registerButton)
+        registerButton = findViewById(R.id.registerButton)
         registerButton.setOnClickListener { onSignUpClick() }
-        loginTextView = findViewById<TextView>(R.id.loginTextView)
+        loginTextView = findViewById(R.id.loginTextView)
         loginTextView.setOnClickListener { onLoginClick() }
 
     }

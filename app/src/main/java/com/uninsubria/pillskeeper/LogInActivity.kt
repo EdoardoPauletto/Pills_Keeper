@@ -27,11 +27,11 @@ class LogInActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         auth = Firebase.auth //inizializza utente col db
-        loginButton = findViewById<Button>(R.id.loginButton)
+        loginButton = findViewById(R.id.loginButton)
         loginButton.setOnClickListener { onLoginClick() }
-        signUpTextView = findViewById<TextView>(R.id.signUpTextView)
+        signUpTextView = findViewById(R.id.signUpTextView)
         signUpTextView.setOnClickListener { onSignUpClick() }
-        forgotPWDTextView = findViewById<TextView>(R.id.forgottenPasswordTextView)
+        forgotPWDTextView = findViewById(R.id.forgottenPasswordTextView)
         forgotPWDTextView.setOnClickListener { onForgotClick() }
     }
 
@@ -42,9 +42,9 @@ class LogInActivity : AppCompatActivity() {
     }
 
     private fun onLoginClick() {
-        emailEditText = findViewById<EditText>(R.id.emailEditText) //prendo i valori
+        emailEditText = findViewById(R.id.emailEditText) //prendo i valori
         val email = emailEditText.text.toString().trim() //trim rimuove gli spazi bianchi
-        passwordEditText = findViewById<EditText>(R.id.passwordEditText)
+        passwordEditText = findViewById(R.id.passwordEditText)
         val password = passwordEditText.text.toString().trim()
         if (email.isEmpty()) { //controlli basilari
             emailEditText.error = "Inserisci email" //multilingue...

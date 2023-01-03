@@ -90,7 +90,7 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
             show()
         }
     }
-    private val delete = { d: DialogInterface, which: Int ->
+    private val delete = { _: DialogInterface, _: Int ->
         Toast.makeText(this, "Cancello " + intent.getStringExtra("key")!!, Toast.LENGTH_SHORT).show()
         val farmaco = intent.getSerializableExtra("Farmaco") as Farmaco
         storageRef.child(farmaco.mImageUrl).delete()
@@ -101,12 +101,12 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
                 }
             }
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.message); //Don't ignore errors!
+                Log.d("TAG", error.message) //Don't ignore errors!
             }
         })
         finish()
     }
-    private val undo = { d: DialogInterface, which: Int ->
+    private val undo = { _: DialogInterface, _: Int ->
         Toast.makeText(this, "Cancellazione annullata", Toast.LENGTH_SHORT).show()
     }
 

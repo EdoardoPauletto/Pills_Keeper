@@ -223,7 +223,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d("TAG", error.message); //Don't ignore errors!
+                Log.d("TAG", error.message) //Don't ignore errors!
             }
         })
     }
@@ -267,7 +267,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun rischedula(position: Int): Long {
-        var f = listaFarmaci[position]
+        val f = listaFarmaci[position]
         var newH = f.time.split(":")[0].toInt()
         var newM = f.time.split(":")[1].toInt()
         var l = 0L
