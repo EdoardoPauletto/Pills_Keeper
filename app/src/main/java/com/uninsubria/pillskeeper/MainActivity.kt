@@ -246,6 +246,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAlarm(){
+        WorkManager.getInstance(this).cancelAllWork()
         for ((i, f) in listaFarmaci.withIndex()){
             if (f.qTot > 0){//quelli esauriti non li schedulo
                 val h = f.time.split(":")[0]
@@ -260,8 +261,19 @@ class MainActivity : AppCompatActivity() {
                     0
                 )
                 var diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
-                if (diff<0)
-                    diff+=86400 //aggiungo 24h
+                if (diff<0){
+                    var i = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1
+                    while (!f.day[i%7])
+                        i++
+                    diff += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
+                    if (f.every.contains("30"))
+                        diff += 1800//30*60sec
+                    else if (f.every.contains("giorni")){
+                        //nulla
+                    } else {
+                        diff += (f.every.split(" ")[1].toInt()*3600)//sec in h
+                    }
+                }
                 val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
                     .setInitialDelay(diff, TimeUnit.SECONDS)
                     .setInputData(workDataOf("key" to listaKey[i]))

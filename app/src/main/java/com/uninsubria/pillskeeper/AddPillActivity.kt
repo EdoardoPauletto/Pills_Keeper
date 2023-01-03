@@ -175,8 +175,6 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
 
     //UPLOAD
     private fun uploadFile() {
-        val now = Calendar.getInstance()
-        Toast.makeText(this, now.get(Calendar.DAY_OF_WEEK).toString(), Toast.LENGTH_SHORT).show()
         val pillName = editTextPillName.text.toString().trim()
         val qntTot = editTextQntTot.text.toString().trim()
         val qnt = editTextQnt.text.toString().trim()
