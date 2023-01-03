@@ -40,16 +40,13 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         databaseRef.child(key!!).addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 farmaco = snapshot.getValue(Farmaco::class.java)!!
-                val nonSforo = farmaco.day[Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1]
-                if (nonSforo){
+                val nonSforo = farmaco.day[Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1]//se erano le 23:40 e la nuova sveglia doveva suonare dopo 30min, va al giorno dopo, ma se il giorno dopo (ovvero quando il work viene chiamato) non devono suonare sveglie...
+                if (nonSforo) {
                     createNotificationChannel()
                     sendRemainderNotification()
                     aggiornaQnt(key)
-                    aggiornaOrario(key)
-                    riSchedula(key)
-                } else
-                    aggiornaOrario(key)
-                    riSchedula(key)
+                }//se sforo ri imposto l'allarme soltanto
+                //riSchedula(key, aggiornaOrario(key))
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.d("TAG", error.message); //Don't ignore errors!
@@ -76,33 +73,42 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
 
     private fun aggiornaQnt(key: String) {
         farmaco.qTot = farmaco.qTot - farmaco.q
+        databaseRef.child(key).setValue(farmaco)//e aggiorno sul db
         if ((farmaco.qTot-farmaco.q*2) <= 0)
             sendFewPillsNotification()
     }
 
-    private fun aggiornaOrario(key: String) {
+    private fun aggiornaOrario(key: String): Long {
         val now = Calendar.getInstance()
-        var h = farmaco.time.split(":")[0].toInt()
-        var m = farmaco.time.split(":")[1].toInt()
-        var count = 0
-        do {//assegno nuovo orario
-            count++
-            if (farmaco.every.contains("30")){
-                m += 30
-                if (m >= 60){
-                    m -= 60
-                    h++
-                }
-            }
-            else if (farmaco.every.contains("giorni")){
-                //nulla
+        var newH = farmaco.time.split(":")[0].toInt()
+        var newM = farmaco.time.split(":")[1].toInt()
+        var delay = 0L
+        var i = now.get(Calendar.DAY_OF_WEEK)-1
+        if (farmaco.day[i]) {//se oggi deve prenderlo, aggiungo solo ore
+            if (farmaco.every.contains("30")) {
+                delay += 1800//30*60sec
+                newM += 30
             } else {
-                h += (farmaco.every.split(" ")[1].toInt())
-                if (h >= 24) h-=24
+                delay += (farmaco.every.split(" ")[1].toInt() * 3600)//sec in h
+                newH += farmaco.every.split(" ")[1].toInt()
             }
-        } while ((now.get(Calendar.HOUR_OF_DAY)!=h || now.get(Calendar.MINUTE)-m > 1) && count!=2)//lo fa al massimo 2 volte(se già non lanciato al suo normale orario)
-        farmaco.time = "$h:$m"
-        databaseRef.child(key).setValue(farmaco)
+            if (newM>=60){
+                newM -= 60
+                newH += 1
+            }
+            if (newH>=24)
+                newH -= 24
+            if (newM<10) //solo per effetto visivo
+                farmaco.time = "$newH:0$newM"
+            else farmaco.time = "$newH:$newM"
+            databaseRef.child(key).setValue(farmaco)//e aggiorno sul db
+        }
+        else {
+            while (!farmaco.day[i%7])
+                i++
+            delay += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
+        }
+        return delay
     }
 
     private fun sendFewPillsNotification() {
@@ -130,51 +136,12 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
     }
 
-    private fun riSchedula(key: String){
-        val now = Calendar.getInstance()
-        if (farmaco.qTot > 0){
-            val h = farmaco.time.split(":")[0]
-            val m = farmaco.time.split(":")[1]
-            val calendar = Calendar.getInstance()
-            calendar.set(
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH),
-                h.toInt(),
-                m.toInt(),
-                0
-            )
-            var diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
-            if (diff<0){
-                var i = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1
-                while (!farmaco.day[i%7])
-                    i++
-                diff += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
-            }
-            val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-                .setInitialDelay(diff, TimeUnit.SECONDS)
-                .setInputData(workDataOf("key" to key))
-                .build()
-            WorkManager.getInstance(c).enqueue(workRequest)
-            /*var delay = 0
-            var i = now.get(Calendar.DAY_OF_WEEK)-1
-            while (!farmaco.day[i%7])
-                i++
-            delay = (i-(now.get(Calendar.DAY_OF_WEEK)-1))*1440 //oggi+(tra n giorni)-oggi *(minuti in 24h)
-            val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-                .setInputData(workDataOf("key" to key))
-            if (ns){//se non sforo (sforo se per esempio imposto la prossima alle 2 di giovedì, ma giovedì non è tra i giorni true)
-                if (farmaco.every.contains("30"))
-                    delay += 30
-                else if (farmaco.every.contains("giorni")){
-                    //nulla
-                } else {
-                    delay += (farmaco.every.split(" ")[1].toInt()*60)
-                }
-            }
-            workRequest.setInitialDelay(delay.toLong(), TimeUnit.MINUTES)
-            WorkManager.getInstance(c).enqueue(workRequest.build())*/
-        }
+    private fun riSchedula(key: String, diff: Long){
+        val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
+            .setInitialDelay(diff, TimeUnit.SECONDS)
+            .setInputData(workDataOf("key" to key))
+            .build()
+        WorkManager.getInstance(c).enqueue(workRequest)
     }
 
     private fun createNotificationChannel(){

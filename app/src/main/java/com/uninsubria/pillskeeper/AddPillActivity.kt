@@ -120,7 +120,10 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
 
     override fun onTimeSet(p0: TimePicker?, h: Int, m: Int) {//quando sel un orario
         editTextTime.error = null //tolgo eventuale errore segnalato perchè vuoto
-        editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
+        if(m<10)
+            editTextTime.text = Editable.Factory.getInstance().newEditable("$h:0$m")
+        else
+            editTextTime.text = Editable.Factory.getInstance().newEditable("$h:$m")
     }
 
     private fun openFileChooser() {

@@ -2,27 +2,22 @@ package com.uninsubria.pillskeeper
 
 import android.Manifest
 import android.app.*
-import android.app.PendingIntent.FLAG_MUTABLE
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -207,25 +202,20 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(baseContext, "Non ci sono farmaci", Toast.LENGTH_SHORT).show()
                 } else {
                     //Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
-                    findViewById<ImageView>(R.id.imageView2).isVisible = false //disattivo testo e immagine
-                    findViewById<TextView>(R.id.textView).isVisible = false
+                    findViewById<ImageView>(R.id.imageView2).isVisible = false//disattivo testo
+                    findViewById<TextView>(R.id.textView).isVisible = false//e immagine
                     // prendo la recycleView
                     val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
-
-                    // this creates a vertical layout Manager
+                    // this creates a vertical layout Manager (altrimenti non sa come visualizzarla)
                     recyclerview.layoutManager = LinearLayoutManager(MainActivity())
-
                     // lista degli elementi da inserire
                     for (f in snapshot.children){
                         listaKey.add(f.key.toString())
                         val tmp = f.getValue(Farmaco::class.java)
-                        //tmp!!.mImageUrl = "https://firebasestorage.googleapis.com/v0/b/prove-b822e.appspot.com/o" + tmp.mImageUrl + "?alt=media&token=aeeefb3e-c3ac-4da3-a62c-0bd67a420c3e"
                         listaFarmaci.add(tmp!!)
                     }
-
                     // This will pass the ArrayList to our Adapter
                     val adapter = PilloleAdapter(listaFarmaci) { position -> onListItemClick(position) }
-
                     // Setting the Adapter with the recyclerview
                     recyclerview.adapter = adapter
                 }
@@ -238,10 +228,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onListItemClick(position: Int) {
-        //Toast.makeText(baseContext, "ciao " + listaFarmaci[position].name, Toast.LENGTH_SHORT).show()
         val intent = Intent(this, AddPillActivity::class.java)
         intent.putExtra("key", listaKey[position])
-        intent.putExtra("Farmaco", listaFarmaci[position])
+        intent.putExtra("Farmaco", listaFarmaci[position])//per questo serve Serializable
         startActivity(intent)
     }
 
@@ -261,19 +250,12 @@ class MainActivity : AppCompatActivity() {
                     0
                 )
                 var diff = (calendar.timeInMillis/1000L)-(Calendar.getInstance().timeInMillis/1000L)
-                if (diff<0){
-                    var i = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1
-                    while (!f.day[i%7])
-                        i++
-                    diff += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
-                    if (f.every.contains("30"))
-                        diff += 1800//30*60sec
-                    else if (f.every.contains("giorni")){
-                        //nulla
-                    } else {
-                        diff += (f.every.split(" ")[1].toInt()*3600)//sec in h
-                    }
+                while (diff<0) {
+                    diff += rischedula(i)
                 }
+                val databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + Firebase.auth.currentUser!!.uid + "/farmaci/")
+                databaseRef.child(listaKey[i]).setValue(listaFarmaci[i])//carico orario nuovo
+                Toast.makeText(baseContext, "Impostata alle " + listaFarmaci[i].time, Toast.LENGTH_LONG).show()
                 val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
                     .setInitialDelay(diff, TimeUnit.SECONDS)
                     .setInputData(workDataOf("key" to listaKey[i]))
@@ -281,5 +263,38 @@ class MainActivity : AppCompatActivity() {
                 WorkManager.getInstance(this).enqueue(workRequest)
             }
         }
+    }
+
+    private fun rischedula(position: Int): Long {
+        var f = listaFarmaci[position]
+        var newH = f.time.split(":")[0].toInt()
+        var newM = f.time.split(":")[1].toInt()
+        var l = 0L
+        var i = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1
+        if (f.day[i]) {//se oggi deve prenderlo, aggiungo solo ore
+            if (f.every.contains("30")) {
+                l += 1800//30*60sec
+                newM += 30
+            } else {
+                l += (f.every.split(" ")[1].toInt() * 3600)//sec in h
+                newH += f.every.split(" ")[1].toInt()
+            }
+            if (newM>=60){
+                newM -= 60
+                newH += 1
+            }
+            if (newH>=24)
+                newH -= 24
+            if (newM<10) //solo per effetto visivo
+                listaFarmaci[position].time = "$newH:0$newM"
+            else listaFarmaci[position].time = "$newH:$newM"
+        }
+        else {
+            while (!f.day[i%7])
+                i++
+            l += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
+        }
+
+        return l
     }
 }
