@@ -2,6 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/refresh"
+        android:title="Aggiorna"
+        app:showAsAction="never"/>
     <item android:id="@+id/geo"
         android:title="trova la farmacia più vivina"
         app:showAsAction="never"/>

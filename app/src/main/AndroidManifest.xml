@@ -20,20 +20,6 @@
         android:theme="@style/Theme.PillsKeeper"
         tools:targetApi="31">
         <activity
-            android:name=".email"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
-            android:name=".sms"
-            android:exported="false">
-            <meta-data
-                android:name="android.app.lib_name"
-                android:value="" />
-        </activity>
-        <activity
             android:name=".ForgotPassword"
             android:exported="false">
             <meta-data

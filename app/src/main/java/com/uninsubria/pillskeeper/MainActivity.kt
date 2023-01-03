@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
             R.id.logout -> onLogoutClick()
             R.id.not -> setAlarm()
             R.id.geo -> openMaps()
+            R.id.refresh -> caricaFarmaci()
         }
         return super.onOptionsItemSelected(item)
     }

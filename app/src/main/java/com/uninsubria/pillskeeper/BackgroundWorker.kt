@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 
 class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
     private val CHANNEL_ID = "canale01"
-    private val databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + Firebase.auth.currentUser!!.uid + "/farmaci/")
+    private val databaseRef = FirebaseDatabase.getInstance().getReference("Users/" + Firebase.auth.currentUser!!.uid)
     private lateinit var farmaco: Farmaco
 
     override fun doWork(): Result {
@@ -37,14 +37,14 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         //leggi orario
         //rischedula, richiamando il worker ad un altro orario
         val key = inputData.getString("key")
-        databaseRef.child(key!!).addListenerForSingleValueEvent(object: ValueEventListener {
+        databaseRef.child("farmaci/$key").addListenerForSingleValueEvent(object: ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 farmaco = snapshot.getValue(Farmaco::class.java)!!
                 val nonSforo = farmaco.day[Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1]//se erano le 23:40 e la nuova sveglia doveva suonare dopo 30min, va al giorno dopo, ma se il giorno dopo (ovvero quando il work viene chiamato) non devono suonare sveglie...
                 if (nonSforo) {
                     createNotificationChannel()
                     sendRemainderNotification()
-                    aggiornaQnt(key)
+                    aggiornaQnt(key!!)
                 }//se sforo ri imposto l'allarme soltanto
                 //riSchedula(key, aggiornaOrario(key))
             }
@@ -73,7 +73,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
 
     private fun aggiornaQnt(key: String) {
         farmaco.qTot = farmaco.qTot - farmaco.q
-        databaseRef.child(key).setValue(farmaco)//e aggiorno sul db
+        databaseRef.child("farmaci/$key").setValue(farmaco)//e aggiorno sul db
         if ((farmaco.qTot-farmaco.q*2) <= 0)
             sendFewPillsNotification()
     }
@@ -101,7 +101,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
             if (newM<10) //solo per effetto visivo
                 farmaco.time = "$newH:0$newM"
             else farmaco.time = "$newH:$newM"
-            databaseRef.child(key).setValue(farmaco)//e aggiorno sul db
+            databaseRef.child("farmaci/$key").setValue(farmaco)//e aggiorno sul db
         }
         else {
             while (!farmaco.day[i%7])
@@ -112,15 +112,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
     }
 
     private fun sendFewPillsNotification() {
-        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()//così se più notifiche allo stesso tempo non va
-        val uri = Uri.parse("smsto:+393467635500, +393334678999")//si possono mettere tutti i numeri
-        val smsIntent = Intent(Intent.ACTION_SENDTO, uri)
-        smsIntent.putExtra("sms_body", "mi dovresti andare a comprare la .... , grazie")
-        val smsPendingIntent = PendingIntent.getActivity(c, 1, smsIntent, PendingIntent.FLAG_IMMUTABLE)
-        val emailIntent = Intent(Intent.ACTION_VIEW)
-        val data: Uri = Uri.parse("mailto:?subject=" + "Buongiorno dottore" + "&body=" + "Volevo avvisarla che ho esaurito la ...." + "&to=" + "giangifumagalli1@gmail.com")
-        emailIntent.data = data
-        val emailPendingIntent = PendingIntent.getActivity(c, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
+        //1)preparo la notifica
         val notificationBuilder = NotificationCompat.Builder(c, CHANNEL_ID)
         notificationBuilder.setSmallIcon(R.mipmap.ic_launcher_foreground)
         notificationBuilder.setContentTitle("Attenzione!")
@@ -128,12 +120,46 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         if (farmaco.qTot == 1.0) notificationBuilder.setContentText("Rimane solo 1 di ${farmaco.name}, stanno per finire!")
         notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
         notificationBuilder.setAutoCancel(false) //almeno rimane anche dopo averci cliccato
-        notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
-        notificationBuilder.setContentIntent(smsPendingIntent)
-        notificationBuilder.addAction(R.drawable.ic_baseline_email_24, "email a medico", emailPendingIntent )
-        notificationBuilder.setContentIntent(emailPendingIntent)
-        val notifictionmanagerCompat = NotificationManagerCompat.from(c)
-        notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
+        //2)preparo gli intent (sms e ...)
+        databaseRef.child("personeFidate").addListenerForSingleValueEvent(object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var numeri = ""
+                for (p in snapshot.children) {
+                    var tmp = p.getValue(ContattiFidati::class.java)
+                    if (numeri == "") numeri += tmp!!.tel
+                    else numeri += ", ${tmp!!.tel}"
+                }
+                val uri = Uri.parse("smsto:$numeri")//si possono mettere più numeri
+                val smsIntent = Intent(Intent.ACTION_SENDTO, uri)
+                smsIntent.putExtra("sms_body", "Mi rimangono solo ${farmaco.qTot} di ${farmaco.name}")
+                val smsPendingIntent = PendingIntent.getActivity(c, 1, smsIntent, PendingIntent.FLAG_IMMUTABLE)
+                notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
+                notificationBuilder.setContentIntent(smsPendingIntent)
+                //3)preparo gli intent (... e mail medico)
+                databaseRef.child("emailMedico").addListenerForSingleValueEvent(object: ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val mailMedico = snapshot.getValue(String::class.java)!!
+                        val emailIntent = Intent(Intent.ACTION_VIEW)
+                        val data: Uri = Uri.parse("mailto:?subject=" + "Esaurimento medicine" + "&body=" + "Buongiorno Dottore,\nVolevo avvisarla che mi rimangono solo ${farmaco.qTot} di ${farmaco.name}.\nMe ne potrebbe prescrivere altre?\nGrazie" + "&to=" + mailMedico)
+                        emailIntent.data = data
+                        val emailPendingIntent = PendingIntent.getActivity(c, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
+                        notificationBuilder.addAction(R.drawable.ic_baseline_email_24, "email a medico", emailPendingIntent )
+                        notificationBuilder.setContentIntent(emailPendingIntent)
+                        //4)genero la notifica
+                        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()//così se più notifiche allo stesso tempo non va
+                        val notifictionmanagerCompat = NotificationManagerCompat.from(c)
+                        notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.d("TAG", error.message); //Don't ignore errors!
+                    }
+                })
+            }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("TAG", error.message); //Don't ignore errors!
+            }
+        })
     }
 
     private fun riSchedula(key: String, diff: Long){
