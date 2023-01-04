@@ -46,7 +46,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
                     sendRemainderNotification()
                     aggiornaQnt(key!!)
                 }//se sforo ri imposto l'allarme soltanto
-                //riSchedula(key, aggiornaOrario(key))
+                riSchedula(key!!, aggiornaOrario(key))
             }
             override fun onCancelled(error: DatabaseError) {
                 Log.d("TAG", error.message) //Don't ignore errors!

@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -16,8 +15,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,16 +29,20 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth //variabile se già loggato o meno
-    lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
-    val listaFarmaci = ArrayList<Farmaco>()
-    val listaKey = ArrayList<String>()
+    private lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
+    private var listaFarmaci = ArrayList<Farmaco>()
+    private var listaKey = ArrayList<String>()
     private companion object{
         private const val CHANNEL_ID = "canale01"
     }
@@ -122,48 +123,6 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "Operazione annullata", Toast.LENGTH_SHORT).show()
     }
 
-    private fun Notification(){
-        createNotificationChannel()
-
-        val date = Date()
-        val notificationId = SimpleDateFormat("ddHHmmss", Locale.ITALIAN).format(Date()).toInt()
-
-        val uri = Uri.parse("smsto:+393467635500")
-        val smsIntent = Intent(Intent.ACTION_SENDTO, uri)
-        smsIntent.putExtra("sms_body", "mi dovresti andare a comprare la .... , grazie")
-        val smsPendingIntent = PendingIntent.getActivity(this, 1, smsIntent, PendingIntent.FLAG_IMMUTABLE)
-        val emailIntent = Intent(Intent.ACTION_VIEW)
-        val data: Uri = Uri.parse("mailto:?subject=" + "Buongiorno dottore" + "&body=" + "Volevo avvisarla che ho esaurito la ...." + "&to=" + "giangifumagalli1@gmail.com")
-        emailIntent.data = data
-        val emailPendingIntent = PendingIntent.getActivity(this, 2, emailIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
-        notificationBuilder.setSmallIcon(R.mipmap.ic_launcher_foreground)
-        notificationBuilder.setContentTitle("Salve")
-        notificationBuilder.setContentText("è mio compito avvertirla che la pillola ... è terminata")
-        notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
-        notificationBuilder.setAutoCancel(false) //almeno rimane anche dopo averci cliccato
-        notificationBuilder.addAction(R.drawable.ic_baseline_sms_24, "sms a persone fidate", smsPendingIntent )
-        notificationBuilder.setContentIntent(smsPendingIntent)
-        notificationBuilder.addAction(R.drawable.ic_baseline_email_24, "email a medico", emailPendingIntent )
-        notificationBuilder.setContentIntent(emailPendingIntent)
-        val notifictionmanagerCompat = NotificationManagerCompat.from(this)
-        notifictionmanagerCompat.notify(notificationId, notificationBuilder.build())
-    }
-
-    private fun createNotificationChannel(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val name: CharSequence = "mynotifica"
-            val desc = "my description"
-
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val notificationChannel = NotificationChannel(CHANNEL_ID, name, importance)
-            notificationChannel.description = desc
-            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-    }
-
     private fun onAddClick() { //quando pulsante cliccato
         val intent = Intent(this, AddPillActivity::class.java)
         startActivity(intent)
@@ -181,44 +140,61 @@ class MainActivity : AppCompatActivity() {
             //setAlarm()
         }
     }
-    /*override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (id == R.id.action_settings){
-
-        } else if (id == R.id.action_new_item){
-
-        } else if (id == R.id.action_logout){
-            auth.signOut()
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
-    }*/
 
     private fun caricaFarmaci(){
-        listaFarmaci.clear()
-        listaKey.clear()
+        var files = cacheDir
+        var fileKey = File("")
+        var fileFarmaci = File("")
+        for (f in files.listFiles()){
+            if (f.name.contains("listaKey"))
+                fileKey = f
+            else if (f.name.contains("listaFarmaci"))
+                fileFarmaci = f
+        }
+        if (fileKey.path != "" && fileFarmaci.path != ""){
+            //esiste, lo leggo
+            listaKey = ObjectInputStream(FileInputStream(fileKey)).readObject() as ArrayList<String>
+            listaFarmaci = ObjectInputStream(FileInputStream(fileFarmaci)).readObject() as ArrayList<Farmaco>
+            createRecycle()//così anche offline crea la lista
+        }
+        else{
+            //non esiste, lo creo
+            fileKey = File.createTempFile("listaKey",null,baseContext.cacheDir)
+            fileFarmaci = File.createTempFile("listaFarmaci",null,baseContext.cacheDir)
+        }
+
+        var newListaFarmaci = ArrayList<Farmaco>()
+        val newListaKey = ArrayList<String>()
         val farmaciDB = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
         farmaciDB.child("farmaci/").addListenerForSingleValueEvent(object: ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()) {
                     Toast.makeText(baseContext, "Non ci sono farmaci", Toast.LENGTH_SHORT).show()
                 } else {
-                    //Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
-                    findViewById<ImageView>(R.id.imageView2).isVisible = false//disattivo testo
-                    findViewById<TextView>(R.id.textView).isVisible = false//e immagine
-                    // prendo la recycleView
-                    val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
-                    // this creates a vertical layout Manager (altrimenti non sa come visualizzarla)
-                    recyclerview.layoutManager = LinearLayoutManager(MainActivity())
                     // lista degli elementi da inserire
                     for (f in snapshot.children){
-                        listaKey.add(f.key.toString())
+                        newListaKey.add(f.key.toString())
                         val tmp = f.getValue(Farmaco::class.java)
-                        listaFarmaci.add(tmp!!)
+                        newListaFarmaci.add(tmp!!)
                     }
-                    // This will pass the ArrayList to our Adapter
-                    val adapter = PilloleAdapter(listaFarmaci) { position -> onListItemClick(position) }
-                    // Setting the Adapter with the recyclerview
-                    recyclerview.adapter = adapter
+                    var cambiato = false
+                    if (listaKey.size == newListaKey.size && listaFarmaci.size == newListaKey.size){
+                        for ((i, k) in listaKey.withIndex()){
+                            if (k != newListaKey[i] || listaFarmaci[i] != newListaFarmaci[i])
+                                cambiato=true
+                        }
+                    } else cambiato=true
+                    if (cambiato){
+                        listaKey.clear()
+                        listaKey = newListaKey
+                        listaFarmaci.clear()
+                        listaFarmaci = newListaFarmaci
+                        Toast.makeText(baseContext, "Aggiorno", Toast.LENGTH_SHORT).show()
+                        ObjectOutputStream(FileOutputStream(fileKey)).writeObject(listaKey)
+                        ObjectOutputStream(FileOutputStream(fileFarmaci)).writeObject(listaFarmaci)
+                        createRecycle()//aggiorno recycle
+                        setAlarm()//aggiorno gli allarmi
+                    }
                 }
             }
 
@@ -226,6 +202,19 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TAG", error.message) //Don't ignore errors!
             }
         })
+    }
+    private fun createRecycle(){
+        //Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
+        findViewById<ImageView>(R.id.imageView2).isVisible = false//disattivo testo
+        findViewById<TextView>(R.id.textView).isVisible = false//e immagine
+        // prendo la recycleView
+        val recyclerview = findViewById<RecyclerView>(R.id.recycleView)
+        // this creates a vertical layout Manager (altrimenti non sa come visualizzarla)
+        recyclerview.layoutManager = LinearLayoutManager(MainActivity())
+        // This will pass the ArrayList to our Adapter
+        val adapter = PilloleAdapter(listaFarmaci) { position -> onListItemClick(position) }
+        // Setting the Adapter with the recyclerview
+        recyclerview.adapter = adapter
     }
 
     private fun onListItemClick(position: Int) {
@@ -295,7 +284,6 @@ class MainActivity : AppCompatActivity() {
                 i++
             l += (i-(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)-1))*86400//aggiungo 24h*n
         }
-
         return l
     }
 }
