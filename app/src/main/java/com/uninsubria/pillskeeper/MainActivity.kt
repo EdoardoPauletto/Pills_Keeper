@@ -151,7 +151,7 @@ class MainActivity : AppCompatActivity() {
             else if (f.name.contains("listaFarmaci"))
                 fileFarmaci = f
         }
-        if (fileKey.path != "" && fileFarmaci.path != ""){
+        if (fileKey.path != "" && fileFarmaci.path != ""){//la prima volta (dopo register) DA ERRORE
             //esiste, lo leggo
             listaKey = ObjectInputStream(FileInputStream(fileKey)).readObject() as ArrayList<String>
             listaFarmaci = ObjectInputStream(FileInputStream(fileFarmaci)).readObject() as ArrayList<Farmaco>
