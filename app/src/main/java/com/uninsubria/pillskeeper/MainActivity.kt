@@ -184,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                                 cambiato=true
                         }
                     } else cambiato=true
-                    if (cambiato){
+                    if (cambiato){//se cancello è DA GESTIRE
                         listaKey.clear()
                         listaKey = newListaKey
                         listaFarmaci.clear()
