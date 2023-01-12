@@ -73,26 +73,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun openMaps() {
         // Search for restaurants nearby
-        val gmmIntentUri = Uri.parse("geo:0,0?q=farmacia")
-        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+
         //mapIntent.setPackage("com.google.android.apps.maps") togliendo questo si può scelgiere quale navigatore utilizzare
-        startActivity(mapIntent)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            } else {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
-            }
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val gmmIntentUri = Uri.parse("geo:0,0?q=farmacia")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
         when (requestCode) {
             1 -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
                         Toast.makeText(this, "permesso consentito", Toast.LENGTH_SHORT).show()
+                        startActivity(mapIntent)
                     }
                 } else {
                     Toast.makeText(this, "Permesso rifiutato", Toast.LENGTH_SHORT).show()
@@ -151,7 +146,7 @@ class MainActivity : AppCompatActivity() {
             else if (f.name.contains("listaFarmaci"))
                 fileFarmaci = f
         }
-        if (fileKey.path != "" && fileFarmaci.path != ""){//la prima volta (dopo register) DA ERRORE
+        if (fileKey.path != "" && fileFarmaci.path != ""){//la prima volta (dopo register) DA ERRORE, esistono ma vuoti
             //esiste, lo leggo
             listaKey = ObjectInputStream(FileInputStream(fileKey)).readObject() as ArrayList<String>
             listaFarmaci = ObjectInputStream(FileInputStream(fileFarmaci)).readObject() as ArrayList<Farmaco>
