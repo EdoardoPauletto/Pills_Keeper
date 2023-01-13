@@ -55,4 +55,5 @@
     <string name="avantiP">→ Avanti</string>
     <string name="DatiPrimaFid">Dati prima persona fidata:</string>
     <string name="indietro">← indietro</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

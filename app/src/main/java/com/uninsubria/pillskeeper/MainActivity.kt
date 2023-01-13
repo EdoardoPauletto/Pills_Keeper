@@ -14,7 +14,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,9 +42,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var addButton : com.google.android.material.floatingactionbutton.FloatingActionButton
     private var listaFarmaci = ArrayList<Farmaco>()
     private var listaKey = ArrayList<String>()
-    private companion object{
-        private const val CHANNEL_ID = "canale01"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,9 +69,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun openMaps() {
         // Search for restaurants nearby
-
+        val intent = Intent(this, MapsActivity::class.java)
+        startActivity(intent)
         //mapIntent.setPackage("com.google.android.apps.maps") togliendo questo si può scelgiere quale navigatore utilizzare
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        //        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -137,7 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun caricaFarmaci(){
-        var files = cacheDir
+        val files = cacheDir
         var fileKey = File("")
         var fileFarmaci = File("")
         for (f in files.listFiles()){
@@ -158,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             fileFarmaci = File.createTempFile("listaFarmaci",null,baseContext.cacheDir)
         }
 
-        var newListaFarmaci = ArrayList<Farmaco>()
+        val newListaFarmaci = ArrayList<Farmaco>()
         val newListaKey = ArrayList<String>()
         val farmaciDB = FirebaseDatabase.getInstance().getReference("Users/" + auth.currentUser!!.uid)
         farmaciDB.child("farmaci/").addListenerForSingleValueEvent(object: ValueEventListener{
