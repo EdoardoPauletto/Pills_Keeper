@@ -1,15 +1,12 @@
 package com.uninsubria.pillskeeper
 
 import android.annotation.SuppressLint
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
-import androidx.appcompat.app.AppCompatActivity
+import android.os.AsyncTask
 import android.os.Bundle
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,11 +14,16 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.Place
-import com.google.android.libraries.places.api.model.PlaceLikelihood
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
+import com.uninsubria.pillskeeper.BuildConfig.MAPS_API_KEY
 import com.uninsubria.pillskeeper.databinding.ActivityMapsBinding
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -78,32 +80,145 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Set the map's camera position to the current location of the device.
                 lastKnownLocation = task.result
                 if (lastKnownLocation != null) {
-                    mMap.addMarker(MarkerOptions().position(LatLng(lastKnownLocation!!.latitude, lastKnownLocation!!.longitude)).title("Sono qua"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                        LatLng(lastKnownLocation!!.latitude,
-                            lastKnownLocation!!.longitude), 15F
-                    ))
+                    val qua = LatLng(lastKnownLocation!!.latitude, lastKnownLocation!!.longitude)
+                    mMap.addMarker(MarkerOptions().position(qua).title("Sono qua"))
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(qua, 15F))
+
+                    val stringa = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"+
+                            "location=${lastKnownLocation!!.latitude}, ${lastKnownLocation!!.longitude}"+
+                            "&radius=5000"+
+                            "&types=pharmacy"+
+                            "&sensor=true"+
+                            "&key=${MAPS_API_KEY}"
+                    var placesTask = PlacesTask(mMap)
+                    placesTask.execute(stringa)
                 }
             }
         }
 
-        /*val geocoder = Geocoder(this)
-        val addressList: List<Address> = geocoder.getFromLocationName("Roma", 10)
-        for (a in addressList){
-            mMap.addMarker(MarkerOptions().position(LatLng(a.latitude,a.longitude)).title("F"))
-        }*/
+    }
 
-        // Use fields to define the data types to return.
-        val placeFields = listOf(Place.Field.NAME)
-        // Use the builder to create a FindCurrentPlaceRequest.
-        val request: FindCurrentPlaceRequest = FindCurrentPlaceRequest.newInstance(placeFields)
-        val placeResponse = placesClient.findCurrentPlace(request)
-        placeResponse.addOnCompleteListener{ task ->
-            if (task.isSuccessful){
-                for (placeLikelihood: PlaceLikelihood in task.result.placeLikelihoods){
-                    Toast.makeText(this, "Nome: '${placeLikelihood.place.name}' , probabilità: ${placeLikelihood.likelihood}", Toast.LENGTH_LONG).show()
-                }
+    private class PlacesTask(var mappa : GoogleMap) : AsyncTask<String, Int, String>() {
+        var data: String = ""
+        override fun doInBackground(vararg p0: String?): String {
+            data = downloadUrl(p0[0]!!)
+            return data
+        }
+        private fun downloadUrl(url: String): String {
+            var da = ""
+            var iStream: InputStream
+            var urlConnection : HttpURLConnection
+            var u = URL(url)
+            urlConnection = u.openConnection() as HttpURLConnection
+            urlConnection.connect()
+            iStream = urlConnection.inputStream
+            var br = BufferedReader(InputStreamReader(iStream))
+            var sb = StringBuffer()
+            var line = br.readLine()
+            while (line != null) {
+                sb.append(line)
+                line = br.readLine()
+            }
+            da = sb.toString()
+            br.close()
+            iStream.close()
+            urlConnection.disconnect()
+            return da
+        }
+
+        override fun onPostExecute(result: String?) {
+            var parserTask = ParserTask(mappa)
+            parserTask.execute(result)
+        }
+
+    }
+
+    private class ParserTask(mappa : GoogleMap) : AsyncTask<String, Int, List<HashMap<String, String>>>() {
+        var googleMap = mappa
+        lateinit var jObject: JSONObject
+        override fun doInBackground(vararg p0: String?): List<HashMap<String, String>> {
+            var places : List<HashMap<String,String>>
+            var placeJson = Place_JSON()
+            jObject = JSONObject(p0[0]!!)
+            places = placeJson.parse(jObject)
+            return places
+        }
+
+        override fun onPostExecute(result: List<HashMap<String, String>>?) {
+            //googleMap.clear()
+            var i = 0
+            while (i<result!!.size){
+                var markerOptions = MarkerOptions()
+                var hmPlace = result[i]
+                var lat = hmPlace["lat"]!!.toDouble()
+                var lng = hmPlace["lng"]!!.toDouble()
+                var name = hmPlace["name"]
+                var vicinity = hmPlace["vicinity"]
+                var hour = hmPlace["hour"]
+                var reference = hmPlace["reference"]
+                var latLng = LatLng(lat, lng)
+                markerOptions.position(latLng)
+                if (hour == "false")
+                    markerOptions.title("CHIUSO: $name")
+                else
+                    markerOptions.title(name)
+                googleMap.addMarker(markerOptions)
+                i++
             }
         }
     }
+
+    private class Place_JSON {
+        fun parse(jObject: JSONObject): ArrayList<HashMap<String, String>> {
+            var jPlaces : JSONArray
+            jPlaces = jObject.getJSONArray("results")
+            return getPlaces(jPlaces)
+        }
+        fun getPlaces(jPlaces: JSONArray): ArrayList<HashMap<String, String>> {
+            var placesCount = jPlaces.length()
+            var placesList = ArrayList<HashMap<String,String>>()
+            var place = HashMap<String,String>()
+            var i = 0
+            while (i<placesCount){
+                place = getPlace(jPlaces.get(i) as JSONObject)
+                placesList.add(place)
+                i++
+            }
+            return placesList
+        }
+        fun getPlace(jPlace : JSONObject): HashMap<String, String> {
+            var place = HashMap<String,String>()
+            var placeName = ""
+            var vicinity = ""
+            var latitude = ""
+            var longitude = ""
+            var hour = ""
+            var reference = ""
+            if (!jPlace.isNull("name"))
+                placeName = jPlace.getString("name")
+            if (!jPlace.isNull("vicinity"))
+                vicinity = jPlace.getString("vicinity")
+            latitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lat")
+            longitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lng")
+            if (!jPlace.isNull("opening_hours"))
+                hour = jPlace.getJSONObject("opening_hours").getString("open_now")
+            reference = jPlace.getString("reference")
+            place["name"] = placeName
+            place["vicinity"] = vicinity
+            place["lat"] = latitude
+            place["lng"] = longitude
+            place["hour"] = hour
+            place["reference"] = reference
+            return place
+
+        }
+    }
 }
+
+
+
+
+
+
+
+
