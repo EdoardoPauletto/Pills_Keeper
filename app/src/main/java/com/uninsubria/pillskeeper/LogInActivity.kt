@@ -16,11 +16,11 @@ class LogInActivity : AppCompatActivity() {
     //inizializzazione variabili
     private lateinit var auth: FirebaseAuth
     private var TAG = "LoginActivity" //inutile, serve solo per i LOG
-    lateinit var loginButton: Button
-    lateinit var signUpTextView: TextView
-    lateinit var forgotPWDTextView: TextView
-    lateinit var emailEditText: EditText
-    lateinit var passwordEditText: EditText
+    private lateinit var loginButton: Button
+    private lateinit var signUpTextView: TextView
+    private lateinit var forgotPWDTextView: TextView
+    private lateinit var emailEditText: EditText
+    private lateinit var passwordEditText: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,15 +79,6 @@ class LogInActivity : AppCompatActivity() {
             }
     }
 
-    /*private fun onForgotClick() { //da fare seriamente
-        val builder = AlertDialog.Builder(this)
-        with(builder) {
-            setTitle("Opzione non valida")
-            setMessage("Opzione in sviluppo, sarà posssibile in futuro")
-            setPositiveButton("OK", null)
-            show()
-        }
-    }*/
     private fun onForgotClick(){
         val intent = Intent(this, ForgotPassword::class.java)
         startActivity(intent)

@@ -304,7 +304,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             place["hour"] = hour
             //place["reference"] = reference
             return place
-
         }
     }
 }

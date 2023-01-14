@@ -38,17 +38,11 @@ class SingUpActivity : AppCompatActivity() {
 
     }
 
-    private fun onLoginClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
+    private fun onLoginClick(){
         val intent = Intent(this, LogInActivity::class.java)
         startActivity(intent)
         finish()
     }
-
-    /*private fun NextClick(){ //serve un intera funzione o basta farlo direttamente sopra??? P.S. stessa cosa nel loginActivity
-        val intent = Intent(this, prima_persona_fidata::class.java)
-        startActivity(intent)
-        finish()
-    }*/
 
     private fun onSignUpClick() {
         nameEditText = findViewById(R.id.Nome)
@@ -88,7 +82,6 @@ class SingUpActivity : AppCompatActivity() {
             return
         }
         utente = User(name, surname, email, password, cell, emailM)//creo un oggetto utente
-        //createUser(userName, email, password, cell, emailM) //ha senso passare ad un altra funzione...?
         val intent = Intent(this, PrimaPersonaFidata::class.java)
         startActivity(intent)
     }

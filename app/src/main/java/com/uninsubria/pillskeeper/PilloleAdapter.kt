@@ -10,7 +10,6 @@ import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
-
 class PilloleAdapter(private val lista: List<Farmaco>, private val onItemClicked: (position: Int) -> Unit): RecyclerView.Adapter<PilloleAdapter.ElementiVista>() {
     // crea nuove views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ElementiVista {
