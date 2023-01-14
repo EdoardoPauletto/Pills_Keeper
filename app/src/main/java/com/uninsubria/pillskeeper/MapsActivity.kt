@@ -1,9 +1,11 @@
 package com.uninsubria.pillskeeper
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Location
 import android.os.AsyncTask
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -12,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -100,11 +103,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         }
-
+        mMap.setOnInfoWindowClickListener { marker ->
+            Toast.makeText(this, marker.title, Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, AddPillActivity::class.java)
+            intent.putExtra("id", marker.id)
+            startActivity(intent)
+        }
+        /*mMap.setOnMarkerClickListener { marker ->
+            if (marker.isInfoWindowShown) {
+                marker.hideInfoWindow()
+            } else {
+                marker.showInfoWindow()
+                Toast.makeText(this, marker.title, Toast.LENGTH_SHORT).show()
+            }
+            true
+        }*/
     }
 
     private class PlacesTask(val mappa: GoogleMap,val placesClient: PlacesClient) : AsyncTask<String, Int, String>() {
         var data: String = ""
+        // Invoked by execute() method of this object
         override fun doInBackground(vararg p0: String?): String {
             data = downloadUrl(p0[0]!!)
             return data
@@ -114,8 +132,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             var iStream: InputStream
             var urlConnection : HttpURLConnection
             var u = URL(url)
+            // Creating an http connection to communicate with url
             urlConnection = u.openConnection() as HttpURLConnection
+            // Connecting to url
             urlConnection.connect()
+            // Reading data from url
             iStream = urlConnection.inputStream
             var br = BufferedReader(InputStreamReader(iStream))
             var sb = StringBuffer()
@@ -130,9 +151,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             urlConnection.disconnect()
             return da
         }
-
+        // Executed after the complete execution of doInBackground() method
         override fun onPostExecute(result: String?) {
             var parserTask = ParserTask(mappa,placesClient)
+            // Start parsing the Google places in JSON format
+            // Invokes the "doInBackground()" method of the class ParserTask
             parserTask.execute(result)
         }
 
@@ -142,6 +165,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var googleMap = mappa
         var plaCli = placesClient
         lateinit var jObject: JSONObject
+        // Invoked by execute() method of this object
         override fun doInBackground(vararg p0: String?): List<HashMap<String, String>> {
             var places : List<HashMap<String,String>>
             var placeJson = Place_JSON()
@@ -149,12 +173,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             places = placeJson.parse(jObject)
             return places
         }
-
+        // Executed after the complete execution of doInBackground() method
         override fun onPostExecute(result: List<HashMap<String, String>>?) {
             //googleMap.clear()
             var i = 0
             while (i<result!!.size){
                 var markerOptions = MarkerOptions()
+                // Getting a place from the places list
                 var hmPlace = result[i]
                 var lat = hmPlace["lat"]!!.toDouble()
                 var lng = hmPlace["lng"]!!.toDouble()
@@ -189,9 +214,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private class Place_JSON {
+        //Receives a JSONObject and returns a list
         fun parse(jObject: JSONObject): ArrayList<HashMap<String, String>> {
             var jPlaces : JSONArray
+            // Retrieves all the elements in the 'places' array
             jPlaces = jObject.getJSONArray("results")
+            //Invoking getPlaces with the array of json object
+            //where each json object represent a place
             return getPlaces(jPlaces)
         }
         fun getPlaces(jPlaces: JSONArray): ArrayList<HashMap<String, String>> {
@@ -199,13 +228,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             var placesList = ArrayList<HashMap<String,String>>()
             var place = HashMap<String,String>()
             var i = 0
+            // Taking each place, parses and adds to list object
             while (i<placesCount){
+                // Call getPlace with place JSON object to parse the place
                 place = getPlace(jPlaces.get(i) as JSONObject)
                 placesList.add(place)
                 i++
             }
             return placesList
         }
+        //Parsing the Place JSON object
         fun getPlace(jPlace : JSONObject): HashMap<String, String> {
             var place = HashMap<String,String>()
             var id = ""
@@ -216,6 +248,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             var hour = ""
             var reference = ""
             id = jPlace.getString("place_id")
+            // Extracting Place name, if available
             if (!jPlace.isNull("name"))
                 placeName = jPlace.getString("name")
             if (!jPlace.isNull("vicinity"))
