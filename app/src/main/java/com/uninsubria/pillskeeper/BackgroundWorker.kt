@@ -87,10 +87,10 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
         var i = now.get(Calendar.DAY_OF_WEEK)-1
         if (farmaco.day[i]) {//se oggi deve prenderlo, aggiungo solo ore
             if (farmaco.every.contains("30")) {
-                delay += 1800//30*60sec
+                //delay += 1800//30*60sec
                 newM += 30
             } else {
-                delay += (farmaco.every.split(" ")[1].toInt() * 3600)//sec in h
+                //delay += (farmaco.every.split(" ")[1].toInt() * 3600)//sec in h
                 newH += farmaco.every.split(" ")[1].toInt()
             }
             if (newM>=60){
@@ -165,7 +165,7 @@ class BackgroundWorker(val c: Context, p: WorkerParameters) : Worker(c, p) {
 
     private fun riSchedula(key: String, diff: Long){
         val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-            .setInitialDelay(diff, TimeUnit.SECONDS)
+            .setInitialDelay(diff-60, TimeUnit.SECONDS)
             .setInputData(workDataOf("key" to key))
             .build()
         WorkManager.getInstance(c).enqueue(workRequest)

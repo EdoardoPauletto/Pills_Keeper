@@ -6,9 +6,6 @@
         android:title="Aggiorna"
         app:showAsAction="never"/>
     <item android:id="@+id/geo"
-        android:title="Trova la farmacia più vicina"
-        app:showAsAction="never"/>
-    <item android:id="@+id/logout"
-        android:title="Esci dall'account"
+        android:title="Apri in Maps"
         app:showAsAction="never"/>
 </menu>

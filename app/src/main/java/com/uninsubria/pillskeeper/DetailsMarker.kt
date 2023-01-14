@@ -27,7 +27,11 @@ class DetailsMarker : AppCompatActivity() {
             .addOnSuccessListener { response: FetchPlaceResponse ->
                 val place = response.place
                 nome.text = place.name
-                info.text = "${place.address} \n Tel: ${place.phoneNumber} \n Valutazione: ${place.rating} su 5"
+                var tel = place.phoneNumber
+                var rat = "sconosciuto"
+                if (tel == null) tel = "sconosciuto"
+                if (place.rating != null) rat = "${place.rating} su 5"
+                info.text = "${place.address} \n Tel: $tel \n Valutazione: $rat"
                 if (place.openingHours != null){
                     val stringBuilder = StringBuilder()
                     for (day in place.openingHours!!.weekdayText){

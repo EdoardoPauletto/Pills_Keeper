@@ -58,9 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
-            //R.id.not -> Notification()
             R.id.logout -> onLogoutClick()
-            R.id.not -> setAlarm()
             R.id.geo -> openMaps()
             R.id.refresh -> caricaFarmaci()
         }
@@ -68,32 +66,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openMaps() {
-        // Search for restaurants nearby
         val intent = Intent(this, MapsActivity::class.java)
         startActivity(intent)
-        //mapIntent.setPackage("com.google.android.apps.maps") togliendo questo si può scelgiere quale navigatore utilizzare
-        //        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
     }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val gmmIntentUri = Uri.parse("geo:0,0?q=farmacia")
-        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-        when (requestCode) {
-            1 -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
-                        Toast.makeText(this, "permesso consentito", Toast.LENGTH_SHORT).show()
-                        startActivity(mapIntent)
-                    }
-                } else {
-                    Toast.makeText(this, "Permesso rifiutato", Toast.LENGTH_SHORT).show()
-                }
-                return
-            }
-        }
-    }
-
 
     private fun onLogoutClick(){
         val builder = AlertDialog.Builder(this)
@@ -129,7 +104,6 @@ class MainActivity : AppCompatActivity() {
             finish()
         } else{
             caricaFarmaci()
-            //setAlarm()
         }
     }
 
@@ -144,10 +118,15 @@ class MainActivity : AppCompatActivity() {
                 fileFarmaci = f
         }
         if (fileKey.path != "" && fileFarmaci.path != ""){//la prima volta (dopo register) DA ERRORE, esistono ma vuoti
-            //esiste, lo leggo
-            listaKey = ObjectInputStream(FileInputStream(fileKey)).readObject() as ArrayList<String>
-            listaFarmaci = ObjectInputStream(FileInputStream(fileFarmaci)).readObject() as ArrayList<Farmaco>
-            createRecycle()//così anche offline crea la lista
+            try {
+                listaKey = ObjectInputStream(FileInputStream(fileKey)).readObject() as ArrayList<String>
+                listaFarmaci = ObjectInputStream(FileInputStream(fileFarmaci)).readObject() as ArrayList<Farmaco>
+                createRecycle()//così anche offline crea la lista
+            } catch (err: Exception){
+                fileKey.delete()
+                fileFarmaci.delete()
+                caricaFarmaci()
+            }
         }
         else{
             //non esiste, lo creo
@@ -162,6 +141,12 @@ class MainActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if(!snapshot.exists()) {
                     Toast.makeText(baseContext, "Non ci sono farmaci", Toast.LENGTH_SHORT).show()
+                    listaKey.clear()
+                    listaFarmaci.clear()
+                    findViewById<ImageView>(R.id.imageView2).isVisible = true//ri attivo testo
+                    findViewById<TextView>(R.id.textView).isVisible = true//e immagine
+                    fileKey.delete()
+                    fileFarmaci.delete()
                 } else {
                     // lista degli elementi da inserire
                     for (f in snapshot.children){
@@ -196,7 +181,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
     private fun createRecycle(){
-        //Toast.makeText(baseContext, "C'è tutto!", Toast.LENGTH_SHORT).show()
         findViewById<ImageView>(R.id.imageView2).isVisible = false//disattivo testo
         findViewById<TextView>(R.id.textView).isVisible = false//e immagine
         // prendo la recycleView
@@ -239,7 +223,7 @@ class MainActivity : AppCompatActivity() {
                 databaseRef.child(listaKey[i]).setValue(listaFarmaci[i])//carico orario nuovo
                 Toast.makeText(baseContext, "Impostata alle " + listaFarmaci[i].time, Toast.LENGTH_LONG).show()
                 val workRequest = OneTimeWorkRequestBuilder<BackgroundWorker>()
-                    .setInitialDelay(diff, TimeUnit.SECONDS)
+                    .setInitialDelay(diff-15, TimeUnit.SECONDS)
                     .setInputData(workDataOf("key" to listaKey[i]))
                     .build()
                 WorkManager.getInstance(this).enqueue(workRequest)

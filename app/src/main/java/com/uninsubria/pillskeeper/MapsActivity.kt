@@ -1,11 +1,19 @@
 package com.uninsubria.pillskeeper
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -28,7 +36,7 @@ import java.net.URL
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-
+    private var autorizzato = false
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -48,6 +56,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.map_menu,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            R.id.refresh -> getLocationPermission()
+            R.id.geo -> openMaps()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun openMaps() {
+        // Search for pharmacy nearby
+        val gmmIntentUri = Uri.parse("geo:0,0?q=farmacia")
+        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+        startActivity(mapIntent)
+    }
 
     /**
      * Manipulates the map once available.
@@ -65,11 +92,22 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         // Add a marker in Varese and move the camera
         val varese = LatLng(45.800363, 8.8453171)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(varese, 12F))
-        //if accesso a gps
-        //  caricoFarmacie vicine
-        //else
-        // caricoVicino Varese
+        caricaFarmacieVicine(varese)// caricoVicino Varese
+        getLocationPermission()
+        if (autorizzato){//caricoFarmacie vicine
+            trovami()
+        }
+        mMap.setOnInfoWindowClickListener { marker ->
+            val intent = Intent(this, DetailsMarker::class.java)
+            intent.putExtra("id", marker.tag.toString())
+            startActivity(intent)
+        }
 
+    }
+
+    @SuppressLint("MissingPermission")
+    fun trovami(){
+        mMap.clear()
         mMap.isMyLocationEnabled = true
         mMap.uiSettings.isMyLocationButtonEnabled = true
         val locationResult = fusedLocationProviderClient.lastLocation
@@ -80,25 +118,56 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (lastKnownLocation != null) {
                     val qua = LatLng(lastKnownLocation!!.latitude, lastKnownLocation!!.longitude)
                     //mMap.addMarker(MarkerOptions().position(qua).title("Sono qua"))
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(qua, 20F))
-
-                    val stringa = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"+
-                            "location=${lastKnownLocation!!.latitude}, ${lastKnownLocation!!.longitude}"+
-                            "&radius=5000"+
-                            "&types=pharmacy"+
-                            "&sensor=true"+
-                            "&key=${MAPS_API_KEY}"
-                    var placesTask = PlacesTask(mMap)
-                    placesTask.execute(stringa)
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(qua, 12F))
+                    caricaFarmacieVicine(qua)
                 }
             }
         }
-        mMap.setOnInfoWindowClickListener { marker ->
-            val intent = Intent(this, DetailsMarker::class.java)
-            intent.putExtra("id", marker.tag.toString())
-            startActivity(intent)
-        }
+    }
 
+    private fun caricaFarmacieVicine(latLng: LatLng){
+        val stringa = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"+
+                "location=${latLng.latitude}, ${latLng.longitude}"+
+                "&radius=5000"+
+                "&types=pharmacy"+
+                "&sensor=true"+
+                "&key=${MAPS_API_KEY}"
+        val placesTask = PlacesTask(mMap)
+        placesTask.execute(stringa)
+    }
+
+    private fun getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(this.applicationContext,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            autorizzato = true
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        }
+    }
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        autorizzato = false
+        when (requestCode) {
+            1 -> {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.isNotEmpty() &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    autorizzato = true
+                    Toast.makeText(this, "Localizzazione...", Toast.LENGTH_SHORT).show()
+                    trovami()
+                }
+                else Toast.makeText(this, "Permesso rifiutato", Toast.LENGTH_SHORT).show()
+            }
+            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
     }
 
     private class PlacesTask(val mappa: GoogleMap) : AsyncTask<String, Int, String>() {
@@ -109,24 +178,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return data
         }
         private fun downloadUrl(url: String): String {
-            var da = ""
-            var iStream: InputStream
-            var urlConnection : HttpURLConnection
-            var u = URL(url)
+            val iStream: InputStream
+            val urlConnection : HttpURLConnection
+            val u = URL(url)
             // Creating an http connection to communicate with url
             urlConnection = u.openConnection() as HttpURLConnection
             // Connecting to url
             urlConnection.connect()
             // Reading data from url
             iStream = urlConnection.inputStream
-            var br = BufferedReader(InputStreamReader(iStream))
-            var sb = StringBuffer()
+            val br = BufferedReader(InputStreamReader(iStream))
+            val sb = StringBuffer()
             var line = br.readLine()
             while (line != null) {
                 sb.append(line)
                 line = br.readLine()
             }
-            da = sb.toString()
+            val da = sb.toString()
             br.close()
             iStream.close()
             urlConnection.disconnect()
@@ -134,7 +202,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         // Executed after the complete execution of doInBackground() method
         override fun onPostExecute(result: String?) {
-            var parserTask = ParserTask(mappa)
+            val parserTask = ParserTask(mappa)
             // Start parsing the Google places in JSON format
             // Invokes the "doInBackground()" method of the class ParserTask
             parserTask.execute(result)
@@ -147,8 +215,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         lateinit var jObject: JSONObject
         // Invoked by execute() method of this object
         override fun doInBackground(vararg p0: String?): List<HashMap<String, String>> {
-            var places : List<HashMap<String,String>>
-            var placeJson = Place_JSON()
+            val places : List<HashMap<String,String>>
+            val placeJson = PlaceJSON()
             jObject = JSONObject(p0[0]!!)
             places = placeJson.parse(jObject)
             return places
@@ -164,18 +232,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val lat = hmPlace["lat"]!!.toDouble()
                 val lng = hmPlace["lng"]!!.toDouble()
                 val name = hmPlace["name"]
-                val vicinity = hmPlace["vicinity"]
+                //val vicinity = hmPlace["vicinity"]
                 val hour = hmPlace["hour"]
                 val latLng = LatLng(lat, lng)
 
                 markerOptions.position(latLng)
                 markerOptions.title(name)
-                if (hour == "false"){
-                    markerOptions.title("CHIUSO: $name")
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
-                }
-                else if (hour == ""){
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                when (hour) {
+                    "false" -> {
+                        markerOptions.snippet("Chiuso")
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
+                    }
+                    "" -> {
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))
+                    }
+                    else -> markerOptions.snippet("Aperto")
                 }
                 googleMap.addMarker(markerOptions)!!.tag = hmPlace["id"]
                 i++
@@ -183,10 +254,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private class Place_JSON {
+    private class PlaceJSON {
         //Receives a JSONObject and returns a list
         fun parse(jObject: JSONObject): ArrayList<HashMap<String, String>> {
-            var jPlaces : JSONArray
+            val jPlaces : JSONArray
             // Retrieves all the elements in the 'places' array
             jPlaces = jObject.getJSONArray("results")
             //Invoking getPlaces with the array of json object
@@ -194,9 +265,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             return getPlaces(jPlaces)
         }
         fun getPlaces(jPlaces: JSONArray): ArrayList<HashMap<String, String>> {
-            var placesCount = jPlaces.length()
-            var placesList = ArrayList<HashMap<String,String>>()
-            var place = HashMap<String,String>()
+            val placesCount = jPlaces.length()
+            val placesList = ArrayList<HashMap<String,String>>()
+            var place: HashMap<String, String>
             var i = 0
             // Taking each place, parses and adds to list object
             while (i<placesCount){
@@ -209,32 +280,29 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         //Parsing the Place JSON object
         fun getPlace(jPlace : JSONObject): HashMap<String, String> {
-            var place = HashMap<String,String>()
-            var id = ""
+            val place = HashMap<String,String>()
             var placeName = ""
-            var vicinity = ""
-            var latitude = ""
-            var longitude = ""
+            //var vicinity = ""
             var hour = ""
-            var reference = ""
-            id = jPlace.getString("place_id")
+            //var reference = ""
+            val id: String = jPlace.getString("place_id")
             // Extracting Place name, if available
             if (!jPlace.isNull("name"))
                 placeName = jPlace.getString("name")
-            if (!jPlace.isNull("vicinity"))
-                vicinity = jPlace.getString("vicinity")
-            latitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lat")
-            longitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lng")
+            //if (!jPlace.isNull("vicinity"))
+            //    vicinity = jPlace.getString("vicinity")
+            val latitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lat")
+            val longitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lng")
             if (!jPlace.isNull("opening_hours"))
                 hour = jPlace.getJSONObject("opening_hours").getString("open_now")
-            reference = jPlace.getString("reference")
+            //reference = jPlace.getString("reference")
             place["id"] = id
             place["name"] = placeName
-            place["vicinity"] = vicinity
+            //place["vicinity"] = vicinity
             place["lat"] = latitude
             place["lng"] = longitude
             place["hour"] = hour
-            place["reference"] = reference
+            //place["reference"] = reference
             return place
 
         }
