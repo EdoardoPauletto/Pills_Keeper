@@ -58,4 +58,8 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="modifica">Modifica</string>
     <string name="delete">Cancella</string>
+    <string name="aggiorna">Aggiorna</string>
+    <string name="apri_in_maps">Apri in Maps</string>
+    <string name="farmacia_vicina">Trova la farmacia più vicina</string>
+    <string name="esci">Esci dall\'account</string>
 </resources>

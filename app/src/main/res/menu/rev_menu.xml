@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/refresh"
-        android:title="Aggiorna"
+        android:title="@string/aggiorna"
         app:showAsAction="never"/>
     <item android:id="@+id/geo"
-        android:title="Trova la farmacia più vicina"
+        android:title="@string/farmacia_vicina"
         app:showAsAction="never"/>
     <item android:id="@+id/logout"
-        android:title="Esci dall'account"
+        android:title="@string/esci"
         app:showAsAction="never"/>
 </menu>

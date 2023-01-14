@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/refresh"
-        android:title="Aggiorna"
+        android:title="@string/aggiorna"
         app:showAsAction="never"/>
     <item android:id="@+id/geo"
-        android:title="Apri in Maps"
+        android:title="@string/apri_in_maps"
         app:showAsAction="never"/>
 </menu>
