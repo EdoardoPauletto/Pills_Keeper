@@ -14,6 +14,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FetchPlaceRequest
+import com.google.android.libraries.places.api.net.FetchPlaceResponse
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.uninsubria.pillskeeper.BuildConfig.MAPS_API_KEY
 import com.uninsubria.pillskeeper.databinding.ActivityMapsBinding
@@ -25,11 +28,13 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+private lateinit var placesClient: PlacesClient
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     // The entry point to the Places API.
-    private lateinit var placesClient: PlacesClient
+
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -90,7 +95,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                             "&types=pharmacy"+
                             "&sensor=true"+
                             "&key=${MAPS_API_KEY}"
-                    var placesTask = PlacesTask(mMap)
+                    var placesTask = PlacesTask(mMap, placesClient)
                     placesTask.execute(stringa)
                 }
             }
@@ -98,7 +103,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private class PlacesTask(var mappa : GoogleMap) : AsyncTask<String, Int, String>() {
+    private class PlacesTask(val mappa: GoogleMap,val placesClient: PlacesClient) : AsyncTask<String, Int, String>() {
         var data: String = ""
         override fun doInBackground(vararg p0: String?): String {
             data = downloadUrl(p0[0]!!)
@@ -127,14 +132,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         override fun onPostExecute(result: String?) {
-            var parserTask = ParserTask(mappa)
+            var parserTask = ParserTask(mappa,placesClient)
             parserTask.execute(result)
         }
 
     }
 
-    private class ParserTask(mappa : GoogleMap) : AsyncTask<String, Int, List<HashMap<String, String>>>() {
+    private class ParserTask(mappa: GoogleMap, placesClient: PlacesClient) : AsyncTask<String, Int, List<HashMap<String, String>>>() {
         var googleMap = mappa
+        var plaCli = placesClient
         lateinit var jObject: JSONObject
         override fun doInBackground(vararg p0: String?): List<HashMap<String, String>> {
             var places : List<HashMap<String,String>>
@@ -155,14 +161,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 var name = hmPlace["name"]
                 var vicinity = hmPlace["vicinity"]
                 var hour = hmPlace["hour"]
-                var reference = hmPlace["reference"]
                 var latLng = LatLng(lat, lng)
-                markerOptions.position(latLng)
+
+                val placeFields = listOf(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.OPENING_HOURS, Place.Field.LAT_LNG)
+                val request = FetchPlaceRequest.newInstance(hmPlace["id"], placeFields)
+                plaCli.fetchPlace(request)
+                    .addOnSuccessListener { response: FetchPlaceResponse ->
+                        val place = response.place
+                        markerOptions.position(place.latLng!!)
+                        markerOptions.title(place.name)
+                        if (hour != ""){
+                            var lunedi = place.openingHours!!.weekdayText
+                            markerOptions.title(lunedi[1])
+                        }
+                        googleMap.addMarker(markerOptions)
+                    }
+
+                /*markerOptions.position(latLng)
                 if (hour == "false")
                     markerOptions.title("CHIUSO: $name")
                 else
                     markerOptions.title(name)
-                googleMap.addMarker(markerOptions)
+                googleMap.addMarker(markerOptions)*/
                 i++
             }
         }
@@ -188,12 +208,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         fun getPlace(jPlace : JSONObject): HashMap<String, String> {
             var place = HashMap<String,String>()
+            var id = ""
             var placeName = ""
             var vicinity = ""
             var latitude = ""
             var longitude = ""
             var hour = ""
             var reference = ""
+            id = jPlace.getString("place_id")
             if (!jPlace.isNull("name"))
                 placeName = jPlace.getString("name")
             if (!jPlace.isNull("vicinity"))
@@ -203,6 +225,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (!jPlace.isNull("opening_hours"))
                 hour = jPlace.getJSONObject("opening_hours").getString("open_now")
             reference = jPlace.getString("reference")
+            place["id"] = id
             place["name"] = placeName
             place["vicinity"] = vicinity
             place["lat"] = latitude
