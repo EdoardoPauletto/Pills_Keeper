@@ -32,7 +32,6 @@ class AddPillActivity : AppCompatActivity(),TimePickerDialog.OnTimeSetListener  
     private lateinit var spinnerWhen: Spinner
     private lateinit var editTextTime: EditText
     private lateinit var buttonTimePicker: Button
-    //private lateinit var textViewDay: TextView prossimamente
     private lateinit var progressBar: ProgressBar
     private lateinit var buttonUpload: Button
     private lateinit var textViewUndoOrDelete: TextView

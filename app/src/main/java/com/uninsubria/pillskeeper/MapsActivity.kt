@@ -23,7 +23,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.uninsubria.pillskeeper.BuildConfig.MAPS_API_KEY
 import com.uninsubria.pillskeeper.databinding.ActivityMapsBinding
 import org.json.JSONArray
 import org.json.JSONObject
@@ -131,7 +130,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 "&radius=5000"+
                 "&types=pharmacy"+
                 "&sensor=true"+
-                "&key=${MAPS_API_KEY}"
+                "&key=${BuildConfig.MAPS_API_KEY}"
         val placesTask = PlacesTask(mMap)
         placesTask.execute(stringa)
     }
